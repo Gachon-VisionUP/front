@@ -9,7 +9,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const root = process.cwd();
+const root = new URL(process.cwd());
 const oldDirs = ["app", "components", "hooks", "constants", "scripts"];
 const newDir = "app-example";
 const newAppDir = "app";
