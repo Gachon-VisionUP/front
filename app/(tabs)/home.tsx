@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
+import { Image, StyleSheet, Text } from 'react-native';
+import { Link } from 'expo-router';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -52,6 +52,14 @@ export default function HomeScreen() {
         </ThemedText> */}
       </ThemedView>
       <HomeTitle />
+      <Link
+        style={styles.button}
+        href={{
+          pathname: "../login",
+        }}
+      >
+        <Text style={styles.buttonText}>로그인 페이지로</Text>
+      </Link>
     </ParallaxScrollView>
   );
 }
@@ -73,4 +81,14 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  button: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: "skyblue",
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  }
 });
