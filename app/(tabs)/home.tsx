@@ -4,6 +4,8 @@ import Title from "../../assets/images/login/Title.png";
 import bell from "../../assets/images/main/bell.png";
 import styled from 'styled-components/native';
 
+import HomeIcon from "../../components/home/homeIcon";
+
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
@@ -25,7 +27,7 @@ export default function HomeScreen() {
           style={styles.bellImage}
         />
       </ImageContainer>
-
+      <HomeIcon />
       <Link
         style={styles.button}
         href={{
