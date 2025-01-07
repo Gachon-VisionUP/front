@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import questIcon from '@/assets/images/main/quest.png';
 
 export default function HomeQuest() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.headerText}>12월 1주차 퀘스트</Text>
+      <View style={styles.headerContainer}>
+        <Image source={questIcon} style={styles.icon} />
+        <Text style={styles.headerText}>퀘스트</Text>
+      </View>
 
       {/* Content */}
       <View style={styles.contentContainer}>
@@ -14,22 +18,15 @@ export default function HomeQuest() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>음성 1센터</Text>
           </View>
-          <Text style={styles.questText}>
-            퀘스트 <Text style={styles.highlightText}>7/7</Text>
-          </Text>
+          <Text style={styles.questText}>1300 <Text style={styles.doText}>do</Text></Text>
         </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
 
         {/* Right Section */}
         <View style={styles.section}>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>직무그룹 1</Text>
           </View>
-          <Text style={styles.questText}>
-            퀘스트 <Text style={styles.highlightText}>3/5</Text>
-          </Text>
+          <Text style={styles.questText}>1500 <Text style={styles.doText}>do</Text></Text>
         </View>
       </View>
     </View>
@@ -38,35 +35,42 @@ export default function HomeQuest() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F58220', // Orange background
+    backgroundColor: '#488EF6',
     borderRadius: 15,
     padding: 20,
     width: 350,
     height: 150,
     justifyContent: 'space-between',
-    marginTop: 15
+    marginTop: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginRight: 8, // Space between icon and text
   },
   headerText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 15,
   },
   contentContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
   section: {
-    alignItems: 'center',
-    justifyContent: 'center',
     flex: 1,
+    alignItems: 'center',
   },
   badge: {
-    backgroundColor: '#FFC04D', // Yellow badge background
-    borderRadius: 10,
+    backgroundColor: '#71A9F7', // Light blue badge background
+    borderRadius: 8,
     paddingVertical: 5,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     marginBottom: 10,
   },
   badgeText: {
@@ -77,16 +81,11 @@ const styles = StyleSheet.create({
   questText: {
     color: 'white',
     fontSize: 16,
-  },
-  highlightText: {
-    color: '#4A90E2', // Blue text
-    fontSize: 20,
     fontWeight: 'bold',
   },
-  divider: {
-    width: 1,
-    height: '70%',
-    backgroundColor: 'white',
-    marginHorizontal: 10,
+  doText: {
+    color: '#FFDF00', // Yellow for 'do'
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
