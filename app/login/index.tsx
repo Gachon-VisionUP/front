@@ -16,13 +16,6 @@ export default function LoginPage() {
           style={styles.imageStyle}
         />
         <Input />
-        <LoginButton
-          onPress={() => console.log("로그인 버튼 클릭")} // 로그인 버튼 클릭 시 처리할 함수
-          as={Link}
-          href="/home"
-        >
-          <ButtonText>로그인</ButtonText>
-        </LoginButton>
       </View>
     </>
   );
