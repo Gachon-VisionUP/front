@@ -8,26 +8,33 @@ import HomeIcon from "@/components/home/homeIcon";
 import HomeTitle from "@/components/home/homeTitle";
 import HomeExp from '@/components/home/homeExp';
 import HomeQuest from '@/components/home/homeQuset';
+
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#000000" barStyle="light-content" animated={true} />
       <ImageContainer>
         {/* Title logo centered */}
-        <CenteredView>
+        <View style={styles.logoContainer}>
           <Image
             source={Title}
-            resizeMode={"stretch"}
+            resizeMode="contain"
             style={styles.imageStyle}
           />
-        </CenteredView>
+        </View>
 
         {/* Bell icon on the right */}
-        <Image
-          source={bell}
-          resizeMode={"stretch"}
-          style={styles.bellImage}
-        />
+        <Link
+          href={{
+            pathname: "../alarm",
+          }}
+        >
+          <Image
+            source={bell}
+            resizeMode="contain"
+            style={styles.bellImage}
+          />
+        </Link>
       </ImageContainer>
       <HomeIcon />
       <HomeTitle />
@@ -45,6 +52,11 @@ export default function HomeScreen() {
   );
 }
 
+// 상단바 옵션 추가
+HomeScreen.options = {
+  headerShown: false, // 상단바 숨기기
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -53,12 +65,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   imageStyle: {
-    width: "45%", // Adjust width
-    height: "40%", // Adjust height
+    width: 160, // Adjust logo width
+    height: 70, // Adjust logo height
+    marginLeft: 25,
   },
   bellImage: {
-    width: "12%", // Adjust width
-    height: "55%", // Adjust height
+    width: 30, // Adjust bell width
+    height: 30, // Adjust bell height
+  },
+  logoContainer: {
+    flex: 1,
+    alignItems: "center", // Center horizontally
+    justifyContent: "center", // Center vertically
   },
   button: {
     marginTop: 20,
@@ -69,21 +87,14 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-  }
+  },
 });
 
 const ImageContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  width: 85%;
-  height: 10%;
+  justify-content: space-between; /* Logo is centered horizontally */
+  width: 90%; /* Adjust container width */
   margin-top: 30px;
-  margin-left: 50px;
-
-`;
-
-const CenteredView = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
+  padding: 0 10px; /* Add padding for spacing */
 `;
