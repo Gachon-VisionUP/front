@@ -1,6 +1,6 @@
 import { Link, Stack } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, StatusBar } from "react-native";
 import img from "../../assets/images/login/Title.png";
 import styled from 'styled-components/native';
 import Input from "../../components/login/input";
@@ -9,6 +9,7 @@ export default function LoginPage() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar backgroundColor="#000000" barStyle="light-content" animated={true} />
       <View style={styles.container}>
         <Image
           source={img}
