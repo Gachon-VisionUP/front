@@ -13,13 +13,13 @@ export default function InputScreen() {
       <InputWrapper>
         {/* 아이디 입력 */}
         <InputContainer>
-          <Icon source={userIcon} />
+          <FrontIcon source={userIcon} />
           <StyledTextInput placeholder="아이디를 입력하세요" placeholderTextColor="#aaa" />
         </InputContainer>
 
         {/* 비밀번호 입력 */}
         <InputContainer>
-          <Icon source={lockIcon} />
+          <FrontIcon source={lockIcon} />
           <StyledTextInput
             placeholder="비밀번호를 입력하세요"
             placeholderTextColor="#aaa"
@@ -68,6 +68,11 @@ const Icon = styled.Image`
   width: 21px;
   height: 13px;
   margin-right: 10px;
+`;
+
+const FrontIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
 `;
 
 // TouchableOpacity로 아이콘 감싸기
