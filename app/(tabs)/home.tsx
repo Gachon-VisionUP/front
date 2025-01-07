@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View, StatusBar } from 'react-native';
 import { Link } from 'expo-router';
-import Title from "../../assets/images/login/Title.png";
+import Title from "../../assets/images/login/Logo.png";
 import bell from "../../assets/images/main/bell.png";
 import styled from 'styled-components/native';
 

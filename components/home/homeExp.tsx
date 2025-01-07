@@ -19,9 +19,6 @@ export default function HomeExp() {
       </View>
       <View style={styles.contentContainer}>
         <View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelText}>상반기 인사평가</Text>
-          </View>
           <Text style={styles.expText}>
             <Text style={styles.expTextWhite}>+ </Text>
             <Text style={styles.expTextNumber}>2500 </Text>
@@ -104,6 +101,7 @@ const styles = StyleSheet.create({
   expText: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 15,
   },
   expTextWhite: {
     color: 'white',
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
   },
   expTextNumber: {
     color: 'white',
-    fontSize: 28, // Increase font size for the number
+    fontSize: 32, // Increase font size for the number
     fontWeight: 'bold',
   },
   expTextOrange: {
