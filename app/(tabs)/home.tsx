@@ -7,7 +7,7 @@ import styled from 'styled-components/native';
 import HomeIcon from "@/components/home/homeIcon";
 import HomeTitle from "@/components/home/homeTitle";
 import HomeExp from '@/components/home/homeExp';
-
+import HomeQuest from '@/components/home/homeQuset';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
@@ -32,6 +32,7 @@ export default function HomeScreen() {
       <HomeIcon />
       <HomeTitle />
       <HomeExp />
+      <HomeQuest />
       <Link
         style={styles.button}
         href={{
@@ -76,7 +77,7 @@ const ImageContainer = styled.View`
   align-items: center;
   width: 85%;
   height: 10%;
-  margin-top: 70px;
+  margin-top: 30px;
   margin-left: 50px;
 
 `;
