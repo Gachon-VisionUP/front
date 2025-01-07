@@ -5,6 +5,7 @@ import bell from "../../assets/images/main/bell.png";
 import styled from 'styled-components/native';
 
 import HomeIcon from "../../components/home/homeIcon";
+import HomeTitle from "../../components/home/homeTitle";
 
 export default function HomeScreen() {
   return (
@@ -28,6 +29,7 @@ export default function HomeScreen() {
         />
       </ImageContainer>
       <HomeIcon />
+      <HomeTitle />
       <Link
         style={styles.button}
         href={{
