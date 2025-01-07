@@ -4,8 +4,9 @@ import Title from "../../assets/images/login/Title.png";
 import bell from "../../assets/images/main/bell.png";
 import styled from 'styled-components/native';
 
-import HomeIcon from "../../components/home/homeIcon";
-import HomeTitle from "../../components/home/homeTitle";
+import HomeIcon from "@/components/home/homeIcon";
+import HomeTitle from "@/components/home/homeTitle";
+import HomeExp from '@/components/home/homeExp';
 
 export default function HomeScreen() {
   return (
@@ -30,6 +31,7 @@ export default function HomeScreen() {
       </ImageContainer>
       <HomeIcon />
       <HomeTitle />
+      <HomeExp />
       <Link
         style={styles.button}
         href={{
