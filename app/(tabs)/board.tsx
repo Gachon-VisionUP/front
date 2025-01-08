@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FlatList, Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import logo from '@/assets/images/login/Logo.png'; // 로고 이미지 import
-
+import logo from '@/assets/images/login/Logo.png';
+import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 interface ItemType {
   id: string;
   title: string;
@@ -27,6 +28,7 @@ const Board = () => {
   const [data, setData] = useState<ItemType[]>(initialData);
   const [searchText, setSearchText] = useState(''); // 검색 텍스트 상태
   const [selectedSort, setSelectedSort] = useState<'latest' | 'oldest'>('latest');
+  const router = useRouter();
 
   const sortData = (order: 'latest' | 'oldest') => {
     const sortedData = [...data].sort((a, b) => {
@@ -55,15 +57,27 @@ const Board = () => {
   };
 
   const renderItem = ({ item }: { item: ItemType }) => (
-    <View style={styles.itemContainer}>
-      <View style={styles.row}>
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: '/post/[id]',
+          params: {
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            date: item.date,
+          },
+        })
+      }
+    >
+      <View style={styles.itemContainer}>
         <Text style={styles.itemNumber}>{item.id}</Text>
         <View style={styles.itemTextContainer}>
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemDate}>{item.date}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -179,6 +193,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#dddddd',
     paddingVertical: 20,
+    flexDirection: 'row'
   },
   row: {
     flexDirection: 'row',
@@ -189,6 +204,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     marginLeft: 13,
+    marginTop: 5,
   },
   itemTextContainer: {
     width: '80%',
