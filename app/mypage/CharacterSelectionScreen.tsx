@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import logo from '@/assets/images/login/Logo.png';
-import backIcon from '@/assets/images/main/back.png';
-import profileIcon from '@/assets/images/main/icon1.png';
-import sampleIcon1 from '@/assets/images/editicon/editicon1.png';
-import sampleIcon2 from '@/assets/images/editicon/editicon2.png';
-import sampleIcon3 from '@/assets/images/editicon/editicon3.png';
-import sampleIcon4 from '@/assets/images/editicon/editicon4.png';
-import sampleIcon5 from '@/assets/images/editicon/editicon5.png';
-import sampleIcon6 from '@/assets/images/editicon/editicon6.png';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useIcon } from "@/context/IconContext"; // Import global icon context
+import logo from "@/assets/images/login/Logo.png";
+import backIcon from "@/assets/images/main/back.png";
+import profileIcon from "@/assets/images/main/icon1.png";
+import sampleIcon1 from "@/assets/images/editicon/editicon1.png";
+import sampleIcon2 from "@/assets/images/editicon/editicon2.png";
+import sampleIcon3 from "@/assets/images/editicon/editicon3.png";
+import sampleIcon4 from "@/assets/images/editicon/editicon4.png";
+import sampleIcon5 from "@/assets/images/editicon/editicon5.png";
+import sampleIcon6 from "@/assets/images/editicon/editicon6.png";
 
 export default function CharacterSelectionScreen() {
   const router = useRouter();
-  const [selectedIcon, setSelectedIcon] = useState(profileIcon);
+  const { icon, setIcon } = useIcon(); // Access global icon state and update function
+  const [selectedIcon, setSelectedIcon] = useState(icon || profileIcon); // Initialize with global icon
 
   const icons = [
     sampleIcon1,
@@ -26,11 +28,12 @@ export default function CharacterSelectionScreen() {
   ];
 
   const handleIconSelect = (icon: any) => {
-    setSelectedIcon(icon);
+    setSelectedIcon(icon); // Update selected icon locally
   };
 
   const handleConfirm = () => {
-    router.push({ pathname: '/mypage', params: { icon: selectedIcon } });
+    setIcon(selectedIcon); // Update global icon
+    router.push("/mypage"); // Navigate back to mypage
   };
 
   return (
@@ -38,7 +41,7 @@ export default function CharacterSelectionScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.push("/mypage")}>
             <Image source={backIcon} style={styles.backIcon} />
           </TouchableOpacity>
           <Image source={logo} resizeMode="contain" style={styles.imageStyle} />
@@ -47,7 +50,9 @@ export default function CharacterSelectionScreen() {
         {/* Current Icon */}
         <View style={styles.currentIconContainer}>
           <Image source={selectedIcon} style={styles.currentIcon} />
-          <Text style={styles.instructionsText}>캐릭터를 눌러서 변경해주세요!</Text>
+          <Text style={styles.instructionsText}>
+            캐릭터를 눌러서 변경해주세요!
+          </Text>
         </View>
 
         {/* Icon Selection Grid */}
@@ -78,18 +83,18 @@ export default function CharacterSelectionScreen() {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#F6F6F6', // SafeAreaView를 위한 배경색
+    backgroundColor: "#F6F6F6",
   },
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: "#F6F6F6",
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     marginBottom: 20,
   },
   backIcon: {
@@ -99,11 +104,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#344BFD',
+    fontWeight: "bold",
+    color: "#344BFD",
   },
   currentIconContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   currentIcon: {
@@ -114,47 +119,47 @@ const styles = StyleSheet.create({
   },
   instructionsText: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
   },
   iconGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '80%',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    width: "80%",
     marginBottom: 20,
   },
   iconWrapper: {
     width: 120,
     height: 120,
     borderRadius: 10,
-    backgroundColor: '#E8E8E8',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E8E8E8",
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 5,
     marginVertical: 10,
   },
   selectedIconWrapper: {
     borderWidth: 2,
-    borderColor: '#488EF6',
+    borderColor: "#488EF6",
   },
   icon: {
     width: 100,
     height: 100,
   },
   confirmButton: {
-    width: '80%',
+    width: "80%",
     padding: 15,
-    backgroundColor: '#488EF6',
+    backgroundColor: "#488EF6",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   confirmButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   imageStyle: {
-    width: 280, // Adjust logo width
-    height: 50, // Adjust logo height
+    width: 280,
+    height: 50,
   },
 });

@@ -1,13 +1,15 @@
 import React from 'react'; 
 import { View, Image, StyleSheet } from 'react-native'; 
-import image from "../../assets/images/main/icon1.png"; 
+import { useIcon } from "@/context/IconContext";// 전역관리 아이콘 
 import background from "../../assets/images/main/background.png";  
 
 export default function HomeIcon() {  
+  const { icon } = useIcon();
+
   return (  
     <View style={styles.container}>  
       <Image source={background} style={styles.backgroundImage} />  
-      <Image source={image} style={styles.image} />  
+      <Image source={icon || background} style={styles.image} /> 
     </View>  
   ); 
 }  
