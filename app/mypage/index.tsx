@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import LogoutModal from '../../components/mypage/LogoutModal';
+import EditInfoModal from '../../components/mypage/EditInfoModal';
 import backIcon from '@/assets/images/main/back.png';
 import profileIcon from '@/assets/images/main/icon1.png';
 import logo from '@/assets/images/login/Logo.png';
@@ -8,6 +10,36 @@ import miniLogo from '@/assets/images/mypage/Logo2.png';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
+
+  const handleLogoutPress = () => {
+    setLogoutModalVisible(true);
+  };
+
+  const handleEditInfoPress = () => {
+    setEditInfoModalVisible(true);
+  };
+
+  const closeLogoutModal = () => {
+    setLogoutModalVisible(false);
+  };
+
+  const closeEditInfoModal = () => {
+    setEditInfoModalVisible(false);
+  };
+
+  const handleEditCharacter = () => {
+    closeEditInfoModal();
+    // Add navigation or logic for editing character
+    console.log('Editing Character...');
+  };
+
+  const handleEditPassword = () => {
+    closeEditInfoModal();
+    // Add navigation or logic for editing password
+    console.log('Editing Password...');
+  };
 
   return (
     <View style={styles.container}>
@@ -17,11 +49,7 @@ export default function ProfileScreen() {
           <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
         <View style={styles.logoContainer}>
-          <Image
-            source={logo}
-            resizeMode="contain"
-            style={styles.imageStyle}
-          />
+          <Image source={logo} resizeMode="contain" style={styles.imageStyle} />
         </View>
       </View>
 
@@ -42,21 +70,28 @@ export default function ProfileScreen() {
           </View>
           <Text style={[styles.levelText, { marginTop: 15 }]}>LV. FI - I</Text>
           <Text style={[styles.infoText, { marginTop: 20 }]}>사번: 2023010101</Text>
-          <Text style={[styles.infoText, { marginTop: 10 }]}>
-            입사일: 2023. 01. 01
-          </Text>
+          <Text style={[styles.infoText, { marginTop: 10 }]}>입사일: 2023. 01. 01</Text>
         </View>
       </View>
 
       {/* Footer */}
       <View style={styles.footerContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleEditInfoPress}>
           <Text style={styles.footerText}>정보 수정하기 &gt;</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleLogoutPress}>
           <Text style={styles.footerText}>로그아웃 &gt;</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modals */}
+      <LogoutModal visible={isLogoutModalVisible} onClose={closeLogoutModal} />
+      <EditInfoModal
+        visible={isEditInfoModalVisible}
+        onClose={closeEditInfoModal}
+        onEditCharacter={handleEditCharacter}
+        onEditPassword={handleEditPassword}
+      />
     </View>
   );
 }
@@ -151,7 +186,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: '#007BFF',
+    color: '#424753',
     fontWeight: 'bold',
   },
   logoContainer: {

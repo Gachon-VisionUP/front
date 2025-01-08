@@ -1,10 +1,10 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
-import { useRouter } from 'expo-router'; // useRouter import
+import { useRouter } from 'expo-router';
 
 export default function HomeTitle() {
-  const router = useRouter(); // useRouter 훅 사용
+  const router = useRouter();
 
   return (
     <Container>

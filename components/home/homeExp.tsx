@@ -4,9 +4,9 @@ import { Svg, Circle } from 'react-native-svg';
 import exp from '@/assets/images/main/exp.png';
 
 export default function HomeExp() {
-  const circleRadius = 50; // Radius of the progress circle
-  const strokeWidth = 10; // Thickness of the circle
-  const progressPercentage = 75; // Progress percentage (e.g., 75%)
+  const circleRadius = 50;
+  const strokeWidth = 10;
+  const progressPercentage = 75;
   const circumference = 2 * Math.PI * circleRadius;
   const progressStroke = (progressPercentage / 100) * circumference;
 
@@ -31,7 +31,7 @@ export default function HomeExp() {
               cx={60}
               cy={60}
               r={circleRadius}
-              stroke="rgba(255, 102, 102, 0.2)" // Background circle color
+              stroke="rgba(255, 102, 102, 0.2)"
               strokeWidth={strokeWidth}
               fill="none"
             />
@@ -39,7 +39,7 @@ export default function HomeExp() {
               cx={60}
               cy={60}
               r={circleRadius}
-              stroke="orange" // Progress circle color
+              stroke="orange"
               strokeWidth={strokeWidth}
               strokeDasharray={`${progressStroke}, ${circumference}`}
               strokeLinecap="round"
@@ -68,14 +68,14 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 10,
-    flexDirection: 'row', // Arrange items in a row
-    alignItems: 'center', // Vertically center items
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerText: {
     color: 'white',
     fontSize: 22,
     fontWeight: 'bold',
-    marginRight: 10, // Add space between headerText and dateText
+    marginRight: 10,
   },
   dateText: {
     color: 'white',
@@ -88,10 +88,10 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   labelContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.22)', // White background with 22% opacity
-    paddingVertical: 5, // Vertical padding for better appearance
-    paddingHorizontal: 10, // Horizontal padding
-    borderRadius: 5, // Rounded corners
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
     marginBottom: 10,
   },
   labelText: {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   expTextNumber: {
     color: 'white',
-    fontSize: 32, // Increase font size for the number
+    fontSize: 32,
     fontWeight: 'bold',
   },
   expTextOrange: {
@@ -119,9 +119,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   chartContainer: {
-    position: 'absolute', // Absolute positioning to move the chart
-    top: -40, // Move the chart upwards
-    right: 0, // Align to the right
+    position: 'absolute',
+    top: -40,
+    right: 0,
     width: 120,
     height: 120,
     justifyContent: 'center',
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 20,
     height: 20,
-    marginRight: 8, // Space between icon and text
+    marginRight: 8,
   },
 });

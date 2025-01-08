@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "expo-router";  // Import useRouter from expo-router
+import { useRouter } from "expo-router";
 import styled from "styled-components/native";
 import userIcon from "../../assets/images/login/user.png";
 import lockIcon from "../../assets/images/login/lock.png";
@@ -12,7 +12,7 @@ export default function InputScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // 에러 메시지를 저장할 상태
 
-  const router = useRouter();  // Initialize the router
+  const router = useRouter();
 
   const validateInputs = () => {
     let valid = true;
@@ -39,8 +39,6 @@ export default function InputScreen() {
     if (validateInputs()) {
       // 검증이 통과하면 로그인 성공
       console.log("Login successful");
-      
-      // Navigate to /home after successful login
       router.push("/home");
     }
   };
@@ -108,7 +106,7 @@ const InputContainer = styled.View`
   align-items: center;
   width: 100%;
   height: 50px;
-  border: 1px solid ${(props: any) => props.borderColor}; /* dynamic border color */
+  border: 1px solid ${(props: any) => props.borderColor};
   border-radius: 8px;
   background-color: #fff;
   padding: 0 10px;
