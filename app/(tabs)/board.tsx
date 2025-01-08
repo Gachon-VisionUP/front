@@ -25,6 +25,7 @@ const parseDate = (dateString: string) => {
 
 const Board = () => {
   const [data, setData] = useState<ItemType[]>(initialData);
+  const [searchText, setSearchText] = useState(''); // 검색 텍스트 상태
   const [selectedSort, setSelectedSort] = useState<'latest' | 'oldest'>('latest');
 
   const sortData = (order: 'latest' | 'oldest') => {
@@ -37,6 +38,20 @@ const Board = () => {
 
     setData(sortedData);
     setSelectedSort(order);
+  };
+
+  const handleSearch = (text: string) => {
+    setSearchText(text);
+    if (text.trim() === '') {
+      setData(initialData);
+    } else {
+      const filteredData = initialData.filter(
+        (item) =>
+          item.title.toLowerCase().includes(text.toLowerCase()) ||
+          item.description.toLowerCase().includes(text.toLowerCase())
+      );
+      setData(filteredData);
+    }
   };
 
   const renderItem = ({ item }: { item: ItemType }) => (
@@ -62,6 +77,8 @@ const Board = () => {
           style={styles.searchInput}
           placeholder="제목, 키워드로 검색"
           placeholderTextColor="#888888"
+          value={searchText} // 입력값과 상태 연결
+          onChangeText={handleSearch} // 입력값 변경 시 필터링 실행
         />
       </View>
       <View style={styles.sortRow}>
@@ -95,10 +112,10 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
   },
   logo: {
-    width: 150, // 로고의 가로 크기
-    height: 50, // 로고의 세로 크기
-    resizeMode: 'contain', // 이미지 비율 유지
-    marginBottom: 20, // 아래 여백
+    width: 150,
+    height: 50,
+    resizeMode: 'contain',
+    marginBottom: 20,
     marginLeft: -15,
   },
   header: {
@@ -175,8 +192,7 @@ const styles = StyleSheet.create({
   },
   itemTextContainer: {
     width: '80%',
-    justifyContent: 'center',
-    alignItems: 'center',
+
   },
   itemTitle: {
     fontSize: 16,
