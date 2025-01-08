@@ -43,16 +43,16 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#488EF6',
     borderRadius: 15,
-    padding: 15, // 기존 20에서 15로 줄임
+    padding: 15,
     width: 350,
-    height: 150, // 높이 줄임
+    height: 150, 
     justifyContent: 'space-between',
     marginTop: 10,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5, // 헤더와 내용 간의 간격 줄임
+    marginBottom: 5, 
     //borderWidth: 2,  
     //borderRadius: 5,  
     //borderStyle: 'solid'  
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   contentContainer: {
-    flexDirection: 'column', // 가로에서 세로로 변경
+    flexDirection: 'column',
     justifyContent: 'flex-start',
     flex: 1,
     alignItems: 'center',
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   spacing: {
-    height: 5, // 음성 1센터와 숫자 간의 간격
+    height: 5,
   },
   questText: {
     color: 'white',
