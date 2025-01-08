@@ -8,11 +8,15 @@ interface EditInfoModalProps {
   onEditPassword: () => void;
 }
 
-const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose, onEditPassword }) => {
+const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose }) => {
   const router = useRouter();
 
   const handleEditCharacter = () => {
-    router.push('/mypage/CharacterSelectionScreen');
+    router.push('/mypage/CharacterSelectionScreen'); // Navigate to character selection screen
+  };
+
+  const handleEditPassword = () => {
+    router.push('/mypage/EditPasswordScreen'); // Navigate to password editing screen
   };
 
   return (
@@ -40,7 +44,7 @@ const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose, onEditPasswor
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.passwordButton]}
-              onPress={onEditPassword}
+              onPress={handleEditPassword}
             >
               <Text style={styles.passwordButtonText}>비밀번호</Text>
             </TouchableOpacity>
