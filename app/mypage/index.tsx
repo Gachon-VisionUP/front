@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import backIcon from '@/assets/images/main/back.png';
-import profileIcon from '@/assets/images/main/icon1.png'; // Placeholder for the profile image
+import profileIcon from '@/assets/images/main/icon1.png';
 import logo from '@/assets/images/login/Logo.png';
+import miniLogo from '@/assets/images/mypage/Logo2.png';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -15,20 +16,36 @@ export default function ProfileScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
-        <Image source={logo} style={styles.logo} />
+        <View style={styles.logoContainer}>
+          <Image
+            source={logo}
+            resizeMode="contain"
+            style={styles.imageStyle}
+          />
+        </View>
       </View>
 
       {/* Profile Card */}
       <View style={styles.cardContainer}>
-        <View style={styles.cardHeader}>
-          <Image source={logo} style={styles.cardLogo} />
+        {/* Orange Section */}
+        <View style={styles.orangeHeader}>
+          <Image source={miniLogo} style={styles.cardLogo} />
         </View>
-        <Image source={profileIcon} style={styles.profileImage} />
-        <Text style={styles.nameText}>김민수</Text>
-        <Text style={styles.centerText}>음성1센터 (1)</Text>
-        <Text style={styles.levelText}>LV. FI - I</Text>
-        <Text style={styles.infoText}>사번: 2023010101</Text>
-        <Text style={styles.infoText}>입사일: 2023. 01. 01</Text>
+        <View style={styles.profileContent}>
+          <Image source={profileIcon} style={styles.profileImage} />
+          {/* Horizontal Row for Name and Center */}
+          <View style={styles.nameRow}>
+            <Text style={[styles.nameText, { color: '#344BFD', fontSize: 24, fontWeight: 'bold' }]}>
+              김민수
+            </Text>
+            <Text style={[styles.centerText, { marginLeft: 10 }]}>음성1센터 (1)</Text>
+          </View>
+          <Text style={[styles.levelText, { marginTop: 15 }]}>LV. FI - I</Text>
+          <Text style={[styles.infoText, { marginTop: 20 }]}>사번: 2023010101</Text>
+          <Text style={[styles.infoText, { marginTop: 10 }]}>
+            입사일: 2023. 01. 01
+          </Text>
+        </View>
       </View>
 
       {/* Footer */}
@@ -37,16 +54,8 @@ export default function ProfileScreen() {
           <Text style={styles.footerText}>정보 수정하기 &gt;</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Text style={styles.footerText}>로그아웃</Text>
+          <Text style={styles.footerText}>로그아웃 &gt;</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <Text style={styles.navText}>홈</Text>
-        <Text style={styles.navText}>경험치 현황</Text>
-        <Text style={styles.navText}>퀘스트 현황</Text>
-        <Text style={styles.navText}>게시판</Text>
       </View>
     </View>
   );
@@ -57,30 +66,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F6F6F6',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingVertical: 50,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    padding: 15,
-    backgroundColor: '#FFF',
-    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    marginBottom: 20,
   },
   backIcon: {
     width: 24,
     height: 24,
+    marginRight: 10,
   },
-  logo: {
-    width: 120,
-    height: 30,
-    resizeMode: 'contain',
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#344BFD',
   },
   cardContainer: {
     backgroundColor: '#FFF',
     width: '90%',
     borderRadius: 15,
-    padding: 20,
+    paddingBottom: 50,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -88,30 +97,40 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  cardHeader: {
+  orangeHeader: {
+    backgroundColor: '#FF6B48',
     width: '100%',
+    height: 50,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    justifyContent: 'center',
     alignItems: 'flex-start',
-    marginBottom: 10,
+    paddingLeft: 15,
   },
   cardLogo: {
     width: 30,
     height: 30,
   },
   profileImage: {
-    width: 80,
-    height: 80,
+    width: 150,
+    height: 150,
     borderRadius: 40,
+    marginTop: -80, // Move the profile image to overlap the orange section
     marginBottom: 10,
   },
+  nameRow: {
+    flexDirection: 'row', // Align horizontally
+    alignItems: 'center', // Vertically center
+    marginBottom: 10, // Spacing below this row
+  },
   nameText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#344BFD',
+    color: '#7A7777',
   },
   centerText: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
+    color: '#7A7777',
   },
   levelText: {
     fontSize: 18,
@@ -122,11 +141,12 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 10, // Add more spacing between 사번 and 입사일
   },
   footerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
+    width: '60%',
     marginTop: 20,
   },
   footerText: {
@@ -134,19 +154,17 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     fontWeight: 'bold',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    width: '100%',
-    paddingVertical: 10,
-    backgroundColor: '#FFF',
-    borderTopWidth: 1,
-    borderTopColor: '#DDD',
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center', // Center horizontally
+    justifyContent: 'center', // Center vertically
   },
-  navText: {
-    fontSize: 14,
-    color: '#344BFD',
-    fontWeight: 'bold',
+  imageStyle: {
+    width: 160, // Adjust logo width
+    height: 70, // Adjust logo height
+  },
+  profileContent: {
+    marginTop: 120, // Adjust this value to move the block further down
+    alignItems: 'center', // Keep content centered
   },
 });
