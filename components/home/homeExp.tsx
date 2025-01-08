@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
+import exp from '@/assets/images/main/exp.png';
 
 export default function HomeExp() {
   const circleRadius = 50; // Radius of the progress circle
@@ -12,14 +13,12 @@ export default function HomeExp() {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
+        <Image source={exp} style={styles.icon} />
         <Text style={styles.headerText}>경험치</Text>
         <Text style={styles.dateText}>2025.01.04 기준</Text>
       </View>
       <View style={styles.contentContainer}>
         <View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelText}>상반기 인사평가</Text>
-          </View>
           <Text style={styles.expText}>
             <Text style={styles.expTextWhite}>+ </Text>
             <Text style={styles.expTextNumber}>2500 </Text>
@@ -60,7 +59,7 @@ export default function HomeExp() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(48, 123, 255, 0.65)',
+    backgroundColor: '#488EF6',
     borderRadius: 15,
     padding: 20,
     width: 350,
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginRight: 10, // Add space between headerText and dateText
   },
@@ -102,6 +101,7 @@ const styles = StyleSheet.create({
   expText: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 15,
   },
   expTextWhite: {
     color: 'white',
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   expTextNumber: {
     color: 'white',
-    fontSize: 28, // Increase font size for the number
+    fontSize: 32, // Increase font size for the number
     fontWeight: 'bold',
   },
   expTextOrange: {
@@ -136,5 +136,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginRight: 8, // Space between icon and text
   },
 });
