@@ -6,8 +6,8 @@ interface PostDetailProps {
     params: {
       id: string;
       title: string;
-      date: string;
       description: string;
+      date: string;
     };
   };
   navigation: {
