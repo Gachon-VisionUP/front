@@ -10,7 +10,7 @@ import SuccessModal from "../../components/mypage/SuccessModal";
 
 export default function EditPasswordScreen() {
     const { icon } = useIcon();
-    const router = useRouter(); // Use the router hook
+    const router = useRouter(); 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);

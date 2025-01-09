@@ -5,10 +5,9 @@ import backIcon from "@/assets/images/main/back.png";
 import Title from "@/assets/images/login/Logo.png";
 
 const PostDetail = () => {
-  const { id, title, description, date } = useLocalSearchParams(); // Retrieve dynamic parameters
+  const { id, title, description, date } = useLocalSearchParams();
   const router = useRouter();
 
-  // Sample initialData used for navigation
   const initialData = [
     { id: '181', title: 'DDD 공지사항', description: '중요 공지, 신청 마감 ~07/20', date: '2024.07.20' },
     { id: '182', title: 'CCC 이벤트', description: '경험치 300 do, 신청 마감 ~08/15', date: '2024.08.15' },
@@ -17,7 +16,6 @@ const PostDetail = () => {
     { id: '185', title: '잡초이스 공고', description: '신청 마감 ~11/20', date: '2024.11.04' },
   ];
 
-  // Find the current post index
   const currentIndex = initialData.findIndex((post) => post.id === id);
 
   const handleNavigation = (direction: 'previous' | 'next') => {

@@ -70,8 +70,8 @@ export default function AlarmScreen() {
 
   const renderItem = ({ item }: any) => (
     <LinearGradient
-      colors={["#8593FF", "#040782"]} // 배경 그라데이션 색상
-      style={[styles.card, { opacity: 0.8 }]} // Opacity 조정
+      colors={["#8593FF", "#040782"]}
+      style={[styles.card, { opacity: 0.8 }]} 
     >
       <View style={styles.cardHeader}>
         {/* 제목 텍스트 */}
@@ -119,8 +119,8 @@ export default function AlarmScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         style={{
-          borderWidth: 0, // 테두리 제거
-          backgroundColor: "transparent", // 배경색 투명 처리
+          borderWidth: 0,
+          backgroundColor: "transparent",
         }}
       />
     </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 15,
-    padding: 30, // 기존 25에서 30으로 증가
+    padding: 30,
     marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -194,21 +194,21 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#FFFFFF", // 흰색 텍스트
+    color: "#FFFFFF",
 
   },
   deleteButton: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#fff", // 흰색 텍스트
+    color: "#fff",
   },
   cardContent: {
     fontSize: 14,
-    color: "#E0E0E0", // 연한 흰색
+    color: "#E0E0E0",
     marginBottom: 10,
   },
   cardDate: {
     fontSize: 12,
-    color: "#D6D6D6", // 더 연한 흰색
+    color: "#D6D6D6",
   },
 });

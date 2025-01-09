@@ -12,11 +12,11 @@ const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose }) => {
   const router = useRouter();
 
   const handleEditCharacter = () => {
-    router.push('/mypage/CharacterSelectionScreen'); // Navigate to character selection screen
+    router.push('/mypage/CharacterSelectionScreen');
   };
 
   const handleEditPassword = () => {
-    router.push('/mypage/EditPasswordScreen'); // Navigate to password editing screen
+    router.push('/mypage/EditPasswordScreen'); 
   };
 
   return (
