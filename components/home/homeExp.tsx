@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
 import exp from '@/assets/images/main/exp.png';
+import { LinearGradient } from "expo-linear-gradient";
+
 
 export default function HomeExp() {
   const circleRadius = 50;
@@ -11,55 +13,59 @@ export default function HomeExp() {
   const progressStroke = (progressPercentage / 100) * circumference;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Image source={exp} style={styles.icon} />
-        <Text style={styles.headerText}>경험치</Text>
-        <Text style={styles.dateText}>2025.01.04 기준</Text>
-      </View>
-      <View style={styles.contentContainer}>
-        <View>
-          <Text style={styles.expText}>
-            <Text style={styles.expTextWhite}>+ </Text>
-            <Text style={styles.expTextNumber}>2500 </Text>
-            <Text style={styles.expTextOrange}>do</Text>
-          </Text>
+    <LinearGradient
+      colors={["#5698CE", "#0681E7"]}
+      style={[styles.card, { opacity: 0.9 }]}
+    >
+      <View>
+        <View style={styles.headerContainer}>
+          <Image source={exp} style={styles.icon} />
+          <Text style={styles.headerText}>경험치</Text>
+          <Text style={styles.dateText}>2025.01.04 기준</Text>
         </View>
-        <View style={styles.chartContainer}>
-          <Svg height={120} width={120}>
-            <Circle
-              cx={60}
-              cy={60}
-              r={circleRadius}
-              stroke="rgba(255, 102, 102, 0.2)"
-              strokeWidth={strokeWidth}
-              fill="none"
-            />
-            <Circle
-              cx={60}
-              cy={60}
-              r={circleRadius}
-              stroke="orange"
-              strokeWidth={strokeWidth}
-              strokeDasharray={`${progressStroke}, ${circumference}`}
-              strokeLinecap="round"
-              fill="none"
-              rotation="-90"
-              origin="60, 60"
-            />
-          </Svg>
-          <View style={styles.circleTextContainer}>
-            <Text style={styles.circleText}>10,500</Text>
+        <View style={styles.contentContainer}>
+          <View>
+            <Text style={styles.expText}>
+              <Text style={styles.expTextWhite}>+ </Text>
+              <Text style={styles.expTextNumber}>2500 </Text>
+              <Text style={styles.expTextOrange}>do</Text>
+            </Text>
+          </View>
+          <View style={styles.chartContainer}>
+            <Svg height={120} width={120}>
+              <Circle
+                cx={60}
+                cy={60}
+                r={circleRadius}
+                stroke="rgba(255, 102, 102, 0.2)"
+                strokeWidth={strokeWidth}
+                fill="none"
+              />
+              <Circle
+                cx={60}
+                cy={60}
+                r={circleRadius}
+                stroke="#FD8568"
+                strokeWidth={strokeWidth}
+                strokeDasharray={`${progressStroke}, ${circumference}`}
+                strokeLinecap="round"
+                fill="none"
+                rotation="-90"
+                origin="60, 60"
+              />
+            </Svg>
+            <View style={styles.circleTextContainer}>
+              <Text style={styles.circleText}>10,500</Text>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#488EF6',
+  card: {
     borderRadius: 15,
     padding: 20,
     width: 350,
@@ -112,9 +118,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 32,
     fontWeight: 'bold',
+    opacity: 1
   },
   expTextOrange: {
-    color: 'orange',
+    color: '#FD8568',
     fontSize: 22,
     fontWeight: 'bold',
   },

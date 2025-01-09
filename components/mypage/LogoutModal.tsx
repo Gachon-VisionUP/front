@@ -27,10 +27,10 @@ const LogoutModal: FC<LogoutModalProps> = ({ visible, onClose }) => {
           <Text style={styles.modalText}>로그아웃을 하시겠습니까?</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.button, styles.noButton]} onPress={onClose}>
-              <Text style={styles.buttonText}>아니오</Text>
+              <Text style={styles.nobuttonText}>아니오</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button, styles.yesButton]} onPress={handleLogout}>
-              <Text style={styles.buttonText}>예</Text>
+              <Text style={styles.yesbuttonText}>예</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -72,16 +72,30 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   noButton: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#F16E27',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 5,
   },
   yesButton: {
-    backgroundColor: '#FF6B48',
+    backgroundColor: '#F16E27',
+    borderColor: '#F16E27',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 5,
   },
-  buttonText: {
-    color: '#FFF',
+  nobuttonText: {
+    color: '#F16E27',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  yesbuttonText: {
+    color: '#F5F5F5',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
 });
 
 export default LogoutModal;
