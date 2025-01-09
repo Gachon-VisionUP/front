@@ -1,10 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import questIcon from '@/assets/images/main/quest.png';
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeQuest() {
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={["#5698CE", "#0681E7"]}
+      style={[styles.card, { opacity: 0.9 }]}
+    >
+
       {/* Header */}
       <View style={styles.headerContainer}>
         <Image source={questIcon} style={styles.icon} />
@@ -35,24 +40,23 @@ export default function HomeQuest() {
           </Text>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#488EF6',
+  card: {
     borderRadius: 15,
     padding: 15,
     width: 350,
-    height: 150, 
+    height: 150,
     justifyContent: 'space-between',
     marginTop: 10,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5, 
+    marginBottom: 5,
     //borderWidth: 2,  
     //borderRadius: 5,  
     //borderStyle: 'solid'  
@@ -75,7 +79,7 @@ const styles = StyleSheet.create({
     //borderWidth: 2,  
     //borderRadius: 5,  
     //borderStyle: 'solid'  
-    
+
   },
   section: {
     flexDirection: 'row',
@@ -90,6 +94,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginBottom: 5,
+    opacity: 0.8
   },
   badgeText: {
     color: 'white',
@@ -101,7 +106,7 @@ const styles = StyleSheet.create({
   },
   questText: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   doText: {

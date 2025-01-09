@@ -3,9 +3,46 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import backIcon from "@/assets/images/main/back.png";
 import Title from "@/assets/images/login/Logo.png";
+
 const PostDetail = () => {
-  const { id, title, description, date } = useLocalSearchParams(); // Retrieve dynamic parameters
+  const { id, title, description, date } = useLocalSearchParams();
   const router = useRouter();
+
+  const initialData = [
+    { id: '181', title: 'DDD 공지사항', description: '중요 공지, 신청 마감 ~07/20', date: '2024.07.20' },
+    { id: '182', title: 'CCC 이벤트', description: '경험치 300 do, 신청 마감 ~08/15', date: '2024.08.15' },
+    { id: '183', title: 'BBB 프로젝트 추가', description: '신청 마감 ~09/30', date: '2024.09.30' },
+    { id: '184', title: 'AAA 프로젝트 신설', description: '경험치 500 do, 신청 마감 ~10/15', date: '2024.10.07' },
+    { id: '185', title: '잡초이스 공고', description: '신청 마감 ~11/20', date: '2024.11.04' },
+  ];
+
+  const currentIndex = initialData.findIndex((post) => post.id === id);
+
+  const handleNavigation = (direction: 'previous' | 'next') => {
+    if (direction === 'previous' && currentIndex > 0) {
+      const previousPost = initialData[currentIndex - 1];
+      router.push({
+        pathname: '/post/[id]',
+        params: {
+          id: previousPost.id,
+          title: previousPost.title,
+          description: previousPost.description,
+          date: previousPost.date,
+        },
+      });
+    } else if (direction === 'next' && currentIndex < initialData.length - 1) {
+      const nextPost = initialData[currentIndex + 1];
+      router.push({
+        pathname: '/post/[id]',
+        params: {
+          id: nextPost.id,
+          title: nextPost.title,
+          description: nextPost.description,
+          date: nextPost.date,
+        },
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -15,6 +52,7 @@ const PostDetail = () => {
         </TouchableOpacity>
         <Image source={Title} style={styles.logo} />
       </View>
+
       {/* Title */}
       <Text style={styles.mainHeader}>게시판</Text>
 
@@ -34,8 +72,17 @@ const PostDetail = () => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>첨부파일</Text>
         <View style={styles.pagination}>
-          <Text style={styles.paginationText}>◀ 이전글</Text>
-          <Text style={styles.paginationText}>다음글 ▶</Text>
+          <TouchableOpacity onPress={() => handleNavigation('previous')} disabled={currentIndex === 0}>
+            <Text style={[styles.paginationText, currentIndex === 0 && styles.disabledText]}>
+              ◀ 이전글
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.separator}/>{/* Separator */}
+          <TouchableOpacity onPress={() => handleNavigation('next')} disabled={currentIndex === initialData.length - 1}>
+            <Text style={[styles.paginationText, currentIndex === initialData.length - 1 && styles.disabledText]}>
+              다음글 ▶
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -105,11 +152,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-
   },
   pagination: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     borderTopWidth: 1,
     borderTopColor: '#ddd',
     paddingTop: 10,
@@ -118,9 +164,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1C6CF9',
   },
+  disabledText: {
+    color: '#ddd',
+  },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 40,
   },
   backIcon: {
@@ -131,7 +180,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 140,
     height: 50,
-    resizeMode: "contain",
+    resizeMode: 'contain',
+  },
+  separator: {
+    width: 1,
+    height: '100%',
+    backgroundColor: '#ddd',
+    marginHorizontal: 10,
   },
 });
 

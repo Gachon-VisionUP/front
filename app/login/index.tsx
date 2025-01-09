@@ -1,7 +1,7 @@
 import { Link, Stack } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View, Image, StatusBar } from "react-native";
-import img from "../../assets/images/login/Title.png";
+import img from "../../assets/images/login/Logo.png";
 import styled from 'styled-components/native';
 import Input from "../../components/login/input";
 
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
   imageStyle: {
     width: "50%", //가로비율
-    height: "5%", //세로비율
+    height: "10%", //세로비율
     alignItems: "center", //중간정렬
     justifyContent: "center",
   },

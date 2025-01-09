@@ -6,11 +6,11 @@ import EditInfoModal from "../../components/mypage/EditInfoModal";
 import backIcon from "@/assets/images/main/back.png";
 import logo from "@/assets/images/login/Logo.png";
 import miniLogo from "@/assets/images/mypage/Logo2.png";
-import { useIcon } from "@/context/IconContext"; // Import global icon context
+import { useIcon } from "@/context/IconContext";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { icon } = useIcon(); // Access the global icon state
+  const { icon } = useIcon();
   const [isLogoutModalVisible, setLogoutModalVisible] = React.useState(false);
   const [isEditInfoModalVisible, setEditInfoModalVisible] = React.useState(false);
 

@@ -5,18 +5,24 @@ import { useRouter } from 'expo-router';
 interface EditInfoModalProps {
   visible: boolean;
   onClose: () => void;
+  onEditCharacter: () => void;
   onEditPassword: () => void;
 }
 
-const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose }) => {
+const EditInfoModal: FC<EditInfoModalProps> = ({
+  visible,
+  onClose,
+  onEditCharacter,
+  onEditPassword,
+}) => {
   const router = useRouter();
 
   const handleEditCharacter = () => {
-    router.push('/mypage/CharacterSelectionScreen'); // Navigate to character selection screen
+    router.push('/mypage/CharacterSelectionScreen');
   };
 
   const handleEditPassword = () => {
-    router.push('/mypage/EditPasswordScreen'); // Navigate to password editing screen
+    router.push('/mypage/EditPasswordScreen');
   };
 
   return (
@@ -114,18 +120,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   characterButton: {
-    backgroundColor: '#488EF6',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#F16E27',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 5,
   },
   passwordButton: {
-    backgroundColor: '#FF6B48',
+    backgroundColor: '#F16E27',
+    borderColor: '#F16E27',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 5,
   },
   characterButtonText: {
-    color: '#FFFFFF',
+    color: '#F16E27',
     fontSize: 16,
     fontWeight: 'bold',
   },
   passwordButtonText: {
-    color: '#FFFFFF',
+    color: '#F5F5F5',
     fontSize: 16,
     fontWeight: 'bold',
   },

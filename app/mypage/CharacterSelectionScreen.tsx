@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useIcon } from "@/context/IconContext"; // Import global icon context
+import { useIcon } from "@/context/IconContext";
 import logo from "@/assets/images/login/Logo.png";
 import backIcon from "@/assets/images/main/back.png";
 import profileIcon from "@/assets/images/main/icon1.png";
@@ -15,8 +15,8 @@ import sampleIcon6 from "@/assets/images/editicon/editicon6.png";
 
 export default function CharacterSelectionScreen() {
   const router = useRouter();
-  const { icon, setIcon } = useIcon(); // Access global icon state and update function
-  const [selectedIcon, setSelectedIcon] = useState(icon || profileIcon); // Initialize with global icon
+  const { icon, setIcon } = useIcon();
+  const [selectedIcon, setSelectedIcon] = useState(icon || profileIcon);
 
   const icons = [
     sampleIcon1,
@@ -28,12 +28,12 @@ export default function CharacterSelectionScreen() {
   ];
 
   const handleIconSelect = (icon: any) => {
-    setSelectedIcon(icon); // Update selected icon locally
+    setSelectedIcon(icon);
   };
 
   const handleConfirm = () => {
-    setIcon(selectedIcon); // Update global icon
-    router.push("/mypage"); // Navigate back to mypage
+    setIcon(selectedIcon);
+    router.push("/mypage");
   };
 
   return (
@@ -55,7 +55,7 @@ export default function CharacterSelectionScreen() {
           </Text>
         </View>
 
-        {/* Icon Selection Grid */}
+        
         <View style={styles.iconGrid}>
           {icons.map((icon, index) => (
             <TouchableOpacity
@@ -71,7 +71,7 @@ export default function CharacterSelectionScreen() {
           ))}
         </View>
 
-        {/* Confirm Button */}
+        
         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
           <Text style={styles.confirmButtonText}>변경</Text>
         </TouchableOpacity>
