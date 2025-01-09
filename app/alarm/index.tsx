@@ -11,9 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import Title from "../../assets/images/login/Logo.png";
 import backIcon from "../../assets/images/main/back.png";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 
-// 데이터 샘플
+// Sample Data
 const data = [
   {
     id: "1",
@@ -70,28 +70,21 @@ export default function AlarmScreen() {
 
   const renderItem = ({ item }: any) => (
     <LinearGradient
-      colors={["#8593FF", "#040782"]}
-      style={[styles.card, { opacity: 0.8 }]} 
+      colors={["#5698CE", "#0681E7"]}
+      style={[styles.card, { opacity: 0.8 }]}
     >
       <View style={styles.cardHeader}>
-        {/* 제목 텍스트 */}
-        <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>
-          {item.title}
-        </Text>
+        {/* Title */}
+        <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>{item.title}</Text>
         <TouchableOpacity>
-          <Text style={[styles.deleteButton, { color: "#FFFFFF" }]}>
-            X
-          </Text>
+          <Text style={[styles.deleteButton, { color: "#FFFFFF" }]}>X</Text>
         </TouchableOpacity>
       </View>
-      {/* 내용 텍스트 */}
-      <Text style={[styles.cardContent, { color: "#E0E0E0" }]}>
-        {item.content}
-      </Text>
+      {/* Content */}
+      <Text style={[styles.cardContent, { color: "#ffffff" }]}>{item.content}</Text>
       <Text style={styles.cardDate}>{item.date}</Text>
     </LinearGradient>
   );
-
 
   return (
     <View style={styles.container}>
@@ -107,8 +100,7 @@ export default function AlarmScreen() {
 
       {/* Filter Section */}
       <View style={styles.filterSection}>
-        <Text style={styles.filterText}>전체 n개</Text>
-        <Text style={styles.filterButton}>전체 ▼</Text>
+        <Text style={styles.filterText}>전체 {data.length}개</Text>
       </View>
 
       {/* FlatList */}
@@ -160,7 +152,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
-
   },
   filterText: {
     fontSize: 18,
@@ -195,7 +186,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#FFFFFF",
-
   },
   deleteButton: {
     fontSize: 16,

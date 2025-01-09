@@ -5,10 +5,16 @@ import { useRouter } from 'expo-router';
 interface EditInfoModalProps {
   visible: boolean;
   onClose: () => void;
+  onEditCharacter: () => void;
   onEditPassword: () => void;
 }
 
-const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose }) => {
+const EditInfoModal: FC<EditInfoModalProps> = ({
+  visible,
+  onClose,
+  onEditCharacter,
+  onEditPassword,
+}) => {
   const router = useRouter();
 
   const handleEditCharacter = () => {
@@ -16,7 +22,7 @@ const EditInfoModal: FC<EditInfoModalProps> = ({ visible, onClose }) => {
   };
 
   const handleEditPassword = () => {
-    router.push('/mypage/EditPasswordScreen'); 
+    router.push('/mypage/EditPasswordScreen');
   };
 
   return (
