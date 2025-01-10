@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     backIcon: {
         width: 24,
         height: 24,
-        marginRight: 10,
     },
     logo: {
         width: 100,

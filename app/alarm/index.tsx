@@ -12,79 +12,105 @@ import { useRouter } from "expo-router";
 import Title from "../../assets/images/login/Logo.png";
 import backIcon from "../../assets/images/main/back.png";
 import { LinearGradient } from "expo-linear-gradient";
+import graph from "@/assets/images/navigation/graph.png";
+import pencil from "@/assets/images/navigation/pencil.png";
 
 // Sample Data
 const data = [
   {
     id: "1",
-    title: "AAA 프로젝트 신설",
-    content: "(경험치 500 do, 신청 마감 ~10/31)",
+    title: "AAA 프로젝트 신설 \n(신청 마감 ~10/31)",
+    content: "",
     date: "2025.01.04",
   },
   {
     id: "2",
-    title: "잡초이스 공고",
-    content: "(신청 마감 ~11/20)",
+    title: "잡초이스 공고 \n(신청 마감 ~11/20)",
+    content: "",
     date: "2025.01.04",
   },
   {
     id: "3",
     title: "최신 경험치",
     content: "2500 do",
-    date: "2025.01.04",
+    date: "직무 퀘스트 | 2025.01.04",
   },
   {
     id: "4",
     title: "최신 경험치",
     content: "1700 do",
-    date: "2025.01.04",
+    date: "전사 프로젝트 | 2025.01.04",
   },
   {
     id: "5",
-    title: "AAA 프로젝트 신설",
-    content: "(경험치 500 do, 신청 마감 ~10/31)",
+    title: "AAA 프로젝트 신설 \n(신청 마감 ~10/31)",
+    content: "",
     date: "2025.01.04",
   },
   {
     id: "6",
-    title: "잡초이스 공고",
-    content: "(신청 마감 ~11/20)",
+    title: "잡초이스 공고\n (신청 마감 ~11/20)",
+    content: "",
     date: "2025.01.04",
   },
   {
     id: "7",
     title: "최신 경험치",
     content: "2500 do",
-    date: "2025.01.04",
+    date: "상반기 인사결과 | 2025.01.04",
   },
   {
     id: "8",
     title: "최신 경험치",
     content: "1700 do",
-    date: "2025.01.04",
+    date: "하반기 인사결과 | 2025.01.04",
   },
 ];
 
 export default function AlarmScreen() {
   const router = useRouter();
 
-  const renderItem = ({ item }: any) => (
-    <LinearGradient
-      colors={["#5698CE", "#0681E7"]}
-      style={[styles.card, { opacity: 0.8 }]}
-    >
-      <View style={styles.cardHeader}>
-        {/* Title */}
-        <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>{item.title}</Text>
-        <TouchableOpacity>
-          <Text style={[styles.deleteButton, { color: "#FFFFFF" }]}>X</Text>
-        </TouchableOpacity>
-      </View>
-      {/* Content */}
-      <Text style={[styles.cardContent, { color: "#ffffff" }]}>{item.content}</Text>
-      <Text style={styles.cardDate}>{item.date}</Text>
-    </LinearGradient>
-  );
+  const renderContent = (content: string) => {
+    const parts = content.split("do"); // Split the string by "do"
+    return (
+      <Text style={[styles.cardContent, { color: "#ffffff" }]}>
+        {parts.map((part, index) => (
+          <Text key={index}>
+            {part}
+            {index < parts.length - 1 && (
+              <Text style={styles.highlightedText}>do</Text>
+            )}
+          </Text>
+        ))}
+      </Text>
+    );
+  };
+
+  const renderItem = ({ item }: any) => {
+    // Determine the icon based on the title content
+    const iconSource = item.title.includes("경험치") ? graph : pencil;
+
+    return (
+      <LinearGradient
+        colors={["#5698CE", "#0681E7"]}
+        style={[styles.card, { opacity: 0.8 }]}
+      >
+        <View style={styles.cardHeader}>
+          {/* Icon and Title */}
+          <View style={styles.titleWithIcon}>
+            <Image source={iconSource} style={[styles.icon, { tintColor: "#FFF" }]} />
+            <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>{item.title}</Text>
+          </View>
+          <TouchableOpacity>
+            <Text style={[styles.deleteButton, { color: "#FFFFFF" }]}>X</Text>
+          </TouchableOpacity>
+        </View>
+        {/* Content */}
+        {renderContent(item.content)}
+        <Text style={styles.cardDate}>{item.date}</Text>
+      </LinearGradient>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -182,6 +208,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+  titleWithIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+  },
   cardTitle: {
     fontSize: 16,
     fontWeight: "bold",
@@ -193,9 +228,12 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   cardContent: {
-    fontSize: 14,
+    fontSize: 24,
     color: "#E0E0E0",
     marginBottom: 10,
+  },
+  highlightedText: {
+    color: "#FF8A6D",
   },
   cardDate: {
     fontSize: 12,
