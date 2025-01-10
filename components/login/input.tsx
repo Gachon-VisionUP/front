@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import styled from "styled-components/native";
+import LoadingScreen from "./loadingScreen"; // 로딩 화면 컴포넌트 가져오기
 import userIcon from "../../assets/images/login/user.png";
 import lockIcon from "../../assets/images/login/lock.png";
 import eyeIcon from "../../assets/images/login/eye.png";
@@ -11,37 +12,39 @@ export default function InputScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // 에러 메시지를 저장할 상태
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
   const router = useRouter();
 
   const validateInputs = () => {
     let valid = true;
 
-    // 아이디가 올바르지 않은 경우
     if (username !== "123") {
       setError("올바른 아이디를 입력해주세요");
       valid = false;
-    }
-    // 아이디는 올바르나 비밀번호가 올바르지 않은 경우
-    else if (username === "123" && password !== "123") {
+    } else if (username === "123" && password !== "123") {
       setError("비밀번호를 다시 확인해주세요");
       valid = false;
-    }
-    // 아이디와 비밀번호가 모두 올바른 경우, 에러 메시지 삭제
-    else {
+    } else {
       setError("");
     }
 
     return valid;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (validateInputs()) {
-      // 검증이 통과하면 로그인 성공
-      console.log("Login successful");
-      router.push("/home");
+      setIsLoading(true); // 로딩 시작
+      setTimeout(() => {
+        setIsLoading(false); // 로딩 종료
+        router.push("/home"); // /home으로 이동
+      }, 3000); // 3초 딜레이
     }
   };
+
+  if (isLoading) {
+    return <LoadingScreen />; // 로딩 화면 표시
+  }
 
   return (
     <Container>
@@ -72,7 +75,6 @@ export default function InputScreen() {
           </TouchableIcon>
         </InputContainer>
 
-        {/* 비밀번호 입력란 아래에만 에러 메시지 표시 */}
         {error ? <ErrorText>{error}</ErrorText> : null}
       </InputWrapper>
 
@@ -125,7 +127,7 @@ const FrontIcon = styled(Icon)`
 `;
 
 const TouchableIcon = styled.TouchableOpacity`
-  padding: 5px; /* 터치 영역 확보 */
+  padding: 5px;
 `;
 
 const LoginButton = styled.TouchableOpacity`
