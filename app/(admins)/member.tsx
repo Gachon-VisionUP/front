@@ -1,23 +1,69 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import logo from "@/assets/images/login/Logo.png";
+import membersData, { Member } from "@/data/membersData"; // 데이터 및 타입 가져오기
 
-export default function MemberScreen() {
+const itemsPerPage = 8;
+
+const MemberScreen: React.FC = () => {
+  const [department, setDepartment] = useState<string>(""); // 부서 선택
+  const [team, setTeam] = useState<string>(""); // 소속 선택
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // 필터링된 데이터
+  const filteredData = membersData.filter((member) => {
+    const departmentMatch = department === "" || member.department === department;
+    const teamMatch = team === "" || member.team === team;
+    return departmentMatch && teamMatch;
+  });
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.logo}>두손쏙Do전!</Text>
-        <Text style={styles.title}>구성원 조회</Text>
-      </View>
+      <Image source={logo} style={styles.logo} />
+      <Text style={styles.header}>구성원 조회</Text>
 
       {/* Dropdown Section */}
       <View style={styles.dropdownContainer}>
-        <TouchableOpacity style={styles.dropdownButton}>
-          <Text style={styles.dropdownText}>부서</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dropdownButton}>
-          <Text style={styles.dropdownText}>소속</Text>
-        </TouchableOpacity>
+        <Picker
+          selectedValue={department}
+          onValueChange={(itemValue: string) => {
+            setDepartment(itemValue);
+            setCurrentPage(1); // 드롭다운 변경 시 첫 페이지로 초기화
+          }}
+          style={styles.dropdown}
+        >
+          <Picker.Item label="부서 선택" value="" />
+          <Picker.Item label="음성 1센터" value="음성 1센터" />
+          <Picker.Item label="음성 2센터" value="음성 2센터" />
+        </Picker>
+
+        <Picker
+          selectedValue={team}
+          onValueChange={(itemValue: string) => {
+            setTeam(itemValue);
+            setCurrentPage(1); // 드롭다운 변경 시 첫 페이지로 초기화
+          }}
+          style={styles.dropdown}
+        >
+          <Picker.Item label="소속 선택" value="" />
+          <Picker.Item label="1" value="1" />
+          <Picker.Item label="2" value="2" />
+        </Picker>
       </View>
 
       {/* Table Section */}
@@ -28,24 +74,39 @@ export default function MemberScreen() {
           <Text style={styles.tableHeaderText}>사번</Text>
           <Text style={styles.tableHeaderText}>이름</Text>
         </View>
-        {Array(8)
-          .fill(0)
-          .map((_, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableRowText}>음성 1센터</Text>
-              <Text style={styles.tableRowText}>1</Text>
-              <Text style={styles.tableRowText}>2000000</Text>
-              <Text style={styles.tableRowText}>박나영</Text>
-              <TouchableOpacity>
-                <Text style={styles.tableRowAction}>✔</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+        {paginatedData.map((item, index) => (
+          <View key={index} style={styles.tableRow}>
+            <Text style={styles.tableRowText}>{item.department}</Text>
+            <Text style={styles.tableRowText}>{item.team}</Text>
+            <Text style={styles.tableRowText}>{item.id}</Text>
+            <Text style={styles.tableRowText}>{item.name}</Text>
+          </View>
+        ))}
       </ScrollView>
 
       {/* Pagination Section */}
       <View style={styles.paginationContainer}>
-        <Text style={styles.paginationText}>1 / 2 / 3 / 4 / 5 &gt;</Text>
+        <TouchableOpacity onPress={() => handlePageChange(currentPage - 1)}>
+          <Text style={styles.paginationText}>&lt;</Text>
+        </TouchableOpacity>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <TouchableOpacity
+            key={i}
+            onPress={() => handlePageChange(i + 1)}
+          >
+            <Text
+              style={[
+                styles.paginationText,
+                currentPage === i + 1 && styles.activePageText,
+              ]}
+            >
+              {i + 1}
+            </Text>
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity onPress={() => handlePageChange(currentPage + 1)}>
+          <Text style={styles.paginationText}>&gt;</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Buttons Section */}
@@ -59,50 +120,44 @@ export default function MemberScreen() {
       </View>
     </View>
   );
-}
+};
+
+export default MemberScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
-  },
-  headerContainer: {
-    alignItems: "center",
-    marginBottom: 20,
+    paddingVertical: 50,
   },
   logo: {
-    fontSize: 18,
+    width: 150,
+    height: 50,
+    resizeMode: "contain",
+    marginBottom: 20,
+    marginLeft: -15,
+  },
+  header: {
+    fontSize: 32,
     fontWeight: "bold",
     color: "#1C6CF9",
     marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1C6CF9",
     borderBottomWidth: 2,
-    borderBottomColor: "#1C6CF9",
-    paddingBottom: 5,
+    borderBottomColor: "#344BFD",
   },
   dropdownContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  dropdownButton: {
+  dropdown: {
     flex: 1,
     marginHorizontal: 5,
-    paddingVertical: 10,
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    alignItems: "center",
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: "#333",
   },
   tableContainer: {
     flex: 1,
@@ -137,20 +192,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
   },
-  tableRowAction: {
-    flex: 0.5,
-    textAlign: "center",
-    fontSize: 14,
-    color: "#1C6CF9",
-    fontWeight: "bold",
-  },
   paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
   paginationText: {
     fontSize: 14,
     color: "#333",
+    marginHorizontal: 5,
+  },
+  activePageText: {
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
   buttonContainer: {
     flexDirection: "row",
