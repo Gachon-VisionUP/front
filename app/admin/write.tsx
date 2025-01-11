@@ -1,163 +1,122 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import styled from 'styled-components/native';
 import Title from '@/assets/images/login/Logo.png';
 import backIcon from '@/assets/images/main/back.png';
 import { useRouter } from 'expo-router';
 
-
 const WritePost = () => {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [attachment, setAttachment] = useState('');
   const router = useRouter();
 
   const handleSave = () => {
-    console.log('Post Saved:', { title, content, attachment });
+    console.log('Post Saved:', { title });
     router.back();
   };
 
   return (
-    <View style={styles.container}>
+    <Container>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Image source={backIcon} style={styles.backIcon} />
-        </TouchableOpacity>
-        <Image source={Title} style={styles.logo} />
-      </View>
-      <Text style={styles.mainHeader}>게시판 글쓰기</Text>
+      <Header>
+        <BackButton onPress={() => router.back()}>
+          <BackIcon source={backIcon} />
+        </BackButton>
+        <Logo source={Title} />
+      </Header>
+      <MainHeader>게시판 글쓰기</MainHeader>
 
       {/* Title Input */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>제목</Text>
-        <TextInput
-          style={styles.input}
+      <InputGroupRow>
+        <Label>제목</Label>
+        <InputRow
           placeholder="제목을 입력해주세요"
-          placeholderTextColor="#888"
+          placeholderTextColor="#000"
           value={title}
           onChangeText={setTitle}
         />
-      </View>
-
-      {/* Date */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>날짜</Text>
-        <TextInput
-          style={styles.input}
-          value={new Date().toISOString().slice(0, 10)}
-          editable={false}
-        />
-      </View>
-
-      {/* Content Input */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>내용</Text>
-        <TextInput
-          style={styles.textArea}
-          multiline
-          numberOfLines={5}
-          placeholder="내용을 입력해주세요"
-          placeholderTextColor="#888"
-          value={content}
-          onChangeText={setContent}
-        />
-      </View>
-
-      {/* Attachment */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>첨부파일</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="첨부파일을 추가해주세요"
-          placeholderTextColor="#888"
-          value={attachment}
-          onChangeText={setAttachment}
-        />
-      </View>
+      </InputGroupRow>
 
       {/* Save Button */}
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>글 저장하기</Text>
-      </TouchableOpacity>
-    </View>
+      <SaveButton onPress={handleSave}>
+        <SaveButtonText>글 저장하기</SaveButtonText>
+      </SaveButton>
+    </Container>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  logo: {
-    flex: 1,
-    width: 140,
-    height: 50,
-    resizeMode: 'contain',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 40,
-
-    marginBottom: 20,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 14,
-    color: '#333',
-  },
-  textArea: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 14,
-    color: '#333',
-    height: 100,
-  },
-  saveButton: {
-    backgroundColor: '#1C6CF9',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  backIcon: {
-    width: 24,
-    height: 24,
-  },
-  mainHeader: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1C6CF9',
-    borderBottomWidth: 2,
-    borderBottomColor: '#1C6CF9',
-    marginBottom: 20,
-  },
-  
-});
-
 export default WritePost;
+
+// Styled Components
+const Container = styled.View`
+  flex: 1;
+  background-color: #fff;
+  padding: 16px;
+`;
+
+const Header = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding-vertical: 40px;
+  margin-bottom: 20px;
+`;
+
+const BackButton = styled.TouchableOpacity``;
+
+const BackIcon = styled.Image`
+  width: 24px;
+  height: 24px;
+`;
+
+const Logo = styled.Image`
+  flex: 1;
+  width: 140px;
+  height: 50px;
+  resize-mode: contain;
+`;
+
+const MainHeader = styled.Text`
+  font-size: 32px;
+  font-weight: bold;
+  color: #1c6cf9;
+  border-bottom-width: 2px;
+  border-bottom-color: #1c6cf9;
+  margin-bottom: 20px;
+`;
+
+const InputGroupRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const Label = styled.Text`
+  font-size: 16px;
+  font-weight: 100;
+  margin-right: 10px;
+  border-bottom-width: 2px;
+  border-bottom-color: #CFCFCF;
+  padding-bottom: 10px;
+`;
+
+const InputRow = styled.TextInput`
+  flex: 1;
+  font-size: 14px;
+  padding: 0;
+  color: #333;
+  border-bottom-width: 2px;
+  border-bottom-color: #CFCFCF;
+  padding-bottom: 14px;
+  font-weight: 500;
+`;
+
+const SaveButton = styled.TouchableOpacity`
+  background-color: #1c6cf9;
+  padding: 15px;
+  border-radius: 10px;
+  align-items: center;
+`;
+
+const SaveButtonText = styled.Text`
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+`;
