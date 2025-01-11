@@ -19,7 +19,9 @@ export default function InputScreen() {
   const validateInputs = () => {
     let valid = true;
 
-    if (username !== "123") {
+    if (username === "admin" && password === "admin") {
+      setError(""); // 관리자 로그인은 에러 없음
+    } else if (username !== "123") {
       setError("올바른 아이디를 입력해주세요");
       valid = false;
     } else if (username === "123" && password !== "123") {
@@ -35,9 +37,15 @@ export default function InputScreen() {
   const handleLogin = async () => {
     if (validateInputs()) {
       setIsLoading(true); // 로딩 시작
+
       setTimeout(() => {
         setIsLoading(false); // 로딩 종료
-        router.push("/home"); // /home으로 이동
+
+        if (username === "admin" && password === "admin") {
+          router.push("/admin"); // 관리자 페이지로 이동
+        } else {
+          router.push("/home"); // 일반 사용자 페이지로 이동
+        }
       }, 3000); // 3초 딜레이
     }
   };
