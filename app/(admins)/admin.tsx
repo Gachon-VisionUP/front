@@ -32,7 +32,10 @@ export default function AdminScreen() {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => router.push("/admin/RegisterMember")}
+                >
                     <Image source={registerIcon} style={styles.icon} />
                     <Text style={styles.buttonText}>
                         구성원 신규 등록 <Text style={styles.greaterThan}>                     &gt;</Text>

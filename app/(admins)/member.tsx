@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "rea
 import { Picker } from "@react-native-picker/picker";
 import logo from "@/assets/images/login/Logo.png";
 import membersData, { Member } from "@/data/membersData"; // 데이터 및 타입 가져오기
+import { useRouter } from 'expo-router';
+
 
 const itemsPerPage = 8;
 
@@ -10,6 +12,7 @@ const MemberScreen: React.FC = () => {
   const [department, setDepartment] = useState<string>(""); // 부서 선택
   const [team, setTeam] = useState<string>(""); // 소속 선택
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const router = useRouter();
 
   // 필터링된 데이터
   const filteredData = membersData.filter((member) => {
@@ -111,7 +114,10 @@ const MemberScreen: React.FC = () => {
 
       {/* Buttons Section */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push('../../admin/RegisterMember')} // 화면 이동
+        >
           <Text style={styles.buttonText}>신규 등록</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
