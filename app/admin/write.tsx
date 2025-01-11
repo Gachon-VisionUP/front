@@ -3,14 +3,22 @@ import styled from 'styled-components/native';
 import Title from '@/assets/images/login/Logo.png';
 import backIcon from '@/assets/images/main/back.png';
 import { useRouter } from 'expo-router';
+import SaveModal from '../../components/admin/SaveModal'; // Modal component
 
-const WritePost = () => {
-  const [title, setTitle] = useState('');
+const WritePost: React.FC = () => {
+  const [title, setTitle] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false); // Modal visibility state
   const router = useRouter();
 
   const handleSave = () => {
-    console.log('Post Saved:', { title });
-    router.back();
+    console.log('Post Saved:', { title, content, date: new Date().toISOString().slice(0, 10) });
+    setModalVisible(true); // Show modal
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false); // Hide modal
+    router.back(); // Navigate back to the board
   };
 
   return (
@@ -35,10 +43,31 @@ const WritePost = () => {
         />
       </InputGroupRow>
 
+      {/* Date Input */}
+      <InputGroupRow>
+        <Label>날짜</Label>
+        <DateText>{new Date().toISOString().slice(0, 10)}</DateText>
+      </InputGroupRow>
+
+      {/* Content Input */}
+      <InputGroup>
+        <TextArea
+          placeholder="내용을 입력해주세요"
+          placeholderTextColor="#000"
+          multiline
+          numberOfLines={5}
+          value={content}
+          onChangeText={setContent}
+        />
+      </InputGroup>
+
       {/* Save Button */}
-      <SaveButton onPress={handleSave}>
+      <SaveButton disabled={!title || !content} onPress={handleSave} isDisabled={!title || !content}>
         <SaveButtonText>글 저장하기</SaveButtonText>
       </SaveButton>
+
+      {/* Save Modal */}
+      <SaveModal visible={modalVisible} onClose={handleCloseModal} />
     </Container>
   );
 };
@@ -82,6 +111,10 @@ const MainHeader = styled.Text`
   margin-bottom: 20px;
 `;
 
+const InputGroup = styled.View`
+  margin-bottom: 20px;
+`;
+
 const InputGroupRow = styled.View`
   flex-direction: row;
   align-items: center;
@@ -89,11 +122,11 @@ const InputGroupRow = styled.View`
 `;
 
 const Label = styled.Text`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 100;
   margin-right: 10px;
   border-bottom-width: 2px;
-  border-bottom-color: #CFCFCF;
+  border-bottom-color: #cfcfcf;
   padding-bottom: 10px;
 `;
 
@@ -103,13 +136,32 @@ const InputRow = styled.TextInput`
   padding: 0;
   color: #333;
   border-bottom-width: 2px;
-  border-bottom-color: #CFCFCF;
+  border-bottom-color: #cfcfcf;
   padding-bottom: 14px;
   font-weight: 500;
 `;
 
-const SaveButton = styled.TouchableOpacity`
-  background-color: #1c6cf9;
+const DateText = styled.Text`
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  border-bottom-width: 2px;
+  border-bottom-color: #cfcfcf;
+  padding-bottom: 14px;
+  font-weight: 500;
+`;
+
+const TextArea = styled.TextInput`
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+  height: 300px;
+  text-align-vertical: top;
+`;
+
+const SaveButton = styled.TouchableOpacity<{ isDisabled: boolean }>`
+  background-color: ${(props) => (props.isDisabled ? '#cfcfcf' : '#1c6cf9')};
   padding: 15px;
   border-radius: 10px;
   align-items: center;

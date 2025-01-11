@@ -1,13 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import homeIcon from "../../assets/images/navigation/home.png";
 import adminImage from "../../assets/images/admin.png";
 import postIcon from "../../assets/images/navigation/pencil.png";
 import registerIcon from "../../assets/images/navigation/paper.png";
 import Logo from "../../assets/images/login/Logo.png";
-
+import { useRouter } from "expo-router";
 
 export default function AdminScreen() {
+    const router = useRouter(); // useRouter 추가
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -22,7 +22,10 @@ export default function AdminScreen() {
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => router.push("/admin/write")}
+                >
                     <Image source={postIcon} style={styles.icon} />
                     <Text style={styles.buttonText}>
                         게시판 글쓰기 <Text style={styles.greaterThan}>                        &gt;</Text>
@@ -38,7 +41,7 @@ export default function AdminScreen() {
             </View>
 
             {/* Bottom Navigation */}
-            
+
         </View>
     );
 }
