@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FlatList, Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import logo from '@/assets/images/login/Logo.png';
-import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 interface ItemType {
   id: string;

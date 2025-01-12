@@ -3,22 +3,22 @@ import styled from 'styled-components/native';
 import Title from '@/assets/images/login/Logo.png';
 import backIcon from '@/assets/images/main/back.png';
 import { useRouter } from 'expo-router';
-import SaveModal from '../../components/admin/SaveModal'; // Modal component
+import SaveModal from '../../components/admin/SaveModal';
 
 const WritePost: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false); // Modal visibility state
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const router = useRouter();
 
   const handleSave = () => {
     console.log('Post Saved:', { title, content, date: new Date().toISOString().slice(0, 10) });
-    setModalVisible(true); // Show modal
+    setModalVisible(true);
   };
 
   const handleCloseModal = () => {
-    setModalVisible(false); // Hide modal
-    router.back(); // Navigate back to the board
+    setModalVisible(false);
+    router.back();
   };
 
   return (
@@ -74,7 +74,6 @@ const WritePost: React.FC = () => {
 
 export default WritePost;
 
-// Styled Components
 const Container = styled.View`
   flex: 1;
   background-color: #fff;
