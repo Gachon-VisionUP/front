@@ -18,7 +18,13 @@ export default function AdminScreen() {
                     <Text style={styles.adminText}>관리자</Text>
                     <Text style={styles.subText}>님 환영합니다!</Text>
                 </Text>
+                <TouchableOpacity
+                    onPress={() => router.push("/login")}
+                >
+                    <Text style={styles.loginOutText}>로그아웃 &gt;</Text>
+                </TouchableOpacity>
             </View>
+
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
@@ -43,8 +49,6 @@ export default function AdminScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Bottom Navigation */}
-
         </View>
     );
 }
@@ -63,7 +67,7 @@ const styles = StyleSheet.create({
     logo: {
         width: 220,
         height: 120,
-        marginBottom: 30, // Increased margin for extra space
+        marginBottom: 30,
         resizeMode: "contain",
     },
     adminImage: {
@@ -74,15 +78,22 @@ const styles = StyleSheet.create({
     welcomeText: {
         flexDirection: "row",
         alignItems: "center",
+        marginBottom: 10,
     },
+    loginOutText: {
+        flexDirection: "row",
+        alignItems: "center",
+        color: "#8D8A8A",
+    },
+
     adminText: {
-        fontSize: 24, // Increased font size for 관리자
+        fontSize: 24,
         fontWeight: "bold",
         color: "#1C6CF9",
     },
     subText: {
-        fontSize: 18, // Reduced font size for 님 환영합니다!
-        color: "#333", // Changed color to black
+        fontSize: 18,
+        color: "#333",
     },
     buttonContainer: {
         width: "100%",
@@ -93,17 +104,17 @@ const styles = StyleSheet.create({
     button: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#fff", // Changed background color to white
+        backgroundColor: "#fff",
         paddingVertical: 15,
         paddingHorizontal: 20,
         borderRadius: 10,
         width: "90%",
         height: "23%",
         marginBottom: 15,
-        elevation: 5, // Increased shadow for more depth
+        elevation: 5,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 }, // Adjusted shadow offset
-        shadowOpacity: 0.2, // Increased shadow opacity
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
         shadowRadius: 5,
     },
     icon: {
@@ -139,8 +150,8 @@ const styles = StyleSheet.create({
         color: "#333",
     },
     greaterThan: {
-        fontSize: 24, // 원하는 크기로 설정
-        color: "#333", // 색상 유지
+        fontSize: 24,
+        color: "#333",
         fontWeight: "bold",
     },
 });

@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import logo from "@/assets/images/login/Logo.png";
-import membersData, { Member } from "@/data/membersData"; // 데이터 및 타입 가져오기
-import { useRouter } from 'expo-router';
-
+import membersData, { Member } from "@/data/membersData";
+import { useRouter } from "expo-router";
 
 const itemsPerPage = 8;
 
@@ -33,6 +39,13 @@ const MemberScreen: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleRowPress = (member: Member) => {
+    router.push({
+      pathname: "/admin/MemberDetail",
+      params: { id: member.id },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -78,12 +91,16 @@ const MemberScreen: React.FC = () => {
           <Text style={styles.tableHeaderText}>이름</Text>
         </View>
         {paginatedData.map((item, index) => (
-          <View key={index} style={styles.tableRow}>
+          <TouchableOpacity
+            key={index}
+            style={styles.tableRow}
+            onPress={() => handleRowPress(item)}
+          >
             <Text style={styles.tableRowText}>{item.department}</Text>
             <Text style={styles.tableRowText}>{item.team}</Text>
             <Text style={styles.tableRowText}>{item.id}</Text>
             <Text style={styles.tableRowText}>{item.name}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -116,12 +133,9 @@ const MemberScreen: React.FC = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => router.push('../../admin/RegisterMember')} // 화면 이동
+          onPress={() => router.push("../../admin/RegisterMember")}
         >
           <Text style={styles.buttonText}>신규 등록</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.buttonText}>조회 및 수정</Text>
         </TouchableOpacity>
       </View>
     </View>
