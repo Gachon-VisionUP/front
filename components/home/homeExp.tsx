@@ -20,8 +20,8 @@ export default function HomeExp() {
       <View>
         <View style={styles.headerContainer}>
           <Image source={exp} style={styles.icon} />
-          <Text style={styles.headerText}>경험치</Text>
-          <Text style={styles.dateText}>2025.01.04 기준</Text>
+          <Text style={styles.headerText}>최신경험치</Text>
+          <Text style={styles.dateText}>25.01.04 기준</Text>
         </View>
         <View style={styles.contentContainer}>
           <View>
@@ -81,11 +81,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 22,
     fontWeight: 'bold',
-    marginRight: 10,
+    marginRight: 5,
   },
   dateText: {
-    color: 'white',
+    color: '#E1E1E1',
     fontSize: 12,
+    marginTop: 10,
   },
   contentContainer: {
     flexDirection: 'row',

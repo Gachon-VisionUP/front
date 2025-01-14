@@ -15,13 +15,13 @@ export default function HomeTitle() {
       <Text style={styles.supportText}>당신의 빛나는 내일을 두핸즈가 응원합니다</Text>
 
       {/* 내 정보 확인하기 버튼 */}
-      {/* @ts-ignore */}
+      {/* @ts-ignore
       <TouchableOpacity
         onPress={() => router.push('/mypage' as any)} // 경로 이동
         style={styles.button}
       >
         <Text style={styles.infoText}>내 정보 확인하기 &gt;</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </Container>
   );
 }
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 10,
   },
   infoText: {
     color: 'black',

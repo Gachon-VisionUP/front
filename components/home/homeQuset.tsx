@@ -9,11 +9,10 @@ export default function HomeQuest() {
       colors={["#5698CE", "#0681E7"]}
       style={[styles.card, { opacity: 0.9 }]}
     >
-
       {/* Header */}
       <View style={styles.headerContainer}>
         <Image source={questIcon} style={styles.icon} />
-        <Text style={styles.headerText}>퀘스트</Text>
+        <Text style={styles.headerText}>최근 퀘스트 경험치</Text>
       </View>
 
       {/* Content */}
@@ -21,22 +20,30 @@ export default function HomeQuest() {
         {/* Section 1 */}
         <View style={styles.section}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>음성 1센터</Text>
+            <Text style={styles.badgeText}>월특근</Text>
           </View>
-          <View style={styles.spacing} />
           <Text style={styles.questText}>
-            1300 <Text style={styles.doText}>do</Text>
+            + 1300 <Text style={styles.doText}>do</Text>
           </Text>
         </View>
 
         {/* Section 2 */}
         <View style={styles.section}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>직무그룹 1</Text>
+            <Text style={styles.badgeText}>업무개선</Text>
           </View>
-          <View style={styles.spacing} />
           <Text style={styles.questText}>
-            1500 <Text style={styles.doText}>do</Text>
+            + 1500 <Text style={styles.doText}>do</Text>
+          </Text>
+        </View>
+
+        {/* Section 3 */}
+        <View style={styles.section}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>직무부여</Text>
+          </View>
+          <Text style={styles.questText}>
+            + 1500 <Text style={styles.doText}>do</Text>
           </Text>
         </View>
       </View>
@@ -56,57 +63,45 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
-    //borderWidth: 2,  
-    //borderRadius: 5,  
-    //borderStyle: 'solid'  
+    marginBottom: 2,
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     marginRight: 8,
   },
   headerText: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   contentContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
     flex: 1,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    //borderWidth: 2,  
-    //borderRadius: 5,  
-    //borderStyle: 'solid'  
-
   },
   section: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    gap: 50,
-
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 20,
   },
   badge: {
     backgroundColor: '#71A9F7',
     borderRadius: 8,
     paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginBottom: 5,
-    opacity: 0.8
+    paddingHorizontal: 15,
+    opacity: 0.8,
   },
   badgeText: {
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
   },
-  spacing: {
-    height: 5,
-  },
   questText: {
     color: 'white',
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   doText: {
