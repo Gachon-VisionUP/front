@@ -1,74 +1,348 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import experienceData from '@/data/experienceData';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const logoImage = require('../../assets/images/login/Logo.png');
 
-export default function QuestScreen() {
+const monthNames = {
+  January: '1월',
+  February: '2월',
+  March: '3월',
+  April: '4월',
+  May: '5월',
+  June: '6월',
+  July: '7월',
+  August: '8월',
+  September: '9월',
+  October: '10월',
+  November: '11월',
+  December: '12월',
+};
+
+const QuestScreen: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('직무별 퀘스트');
+  const [year, setYear] = useState<number>(2024);
+
+  // 최소 및 최대 연도
+  const minYear = Math.min(...Object.keys(experienceData.week).map(Number));
+  const maxYear = Math.max(...Object.keys(experienceData.week).map(Number));
+
+  const renderWeeks = (monthData: { [key: string]: { experience: number } }) => {
+    return Object.keys(monthData).map((weekKey) => {
+      const week = monthData[weekKey];
+      const isActive = week.experience > 0;
+      return (
+        <View key={weekKey} style={styles.weekContainer}>
+          <View
+            style={[
+              styles.weekCircle,
+              isActive ? styles.activeWeekCircle : styles.inactiveWeekCircle,
+            ]}
+          >
+            <Text style={[styles.weekLabel, isActive && styles.activeWeekLabel]}>
+              {weekKey.replace('Week', '')}주차
+            </Text>
+          </View>
+          {isActive && (
+            <Text style={styles.experienceText}>
+              <Text style={styles.experienceNumber}>+{week.experience}</Text>{' '}
+              <Text style={styles.experienceUnit}>do</Text>
+            </Text>
+          )}
+        </View>
+      );
+    });
+  };
+
+  const renderMonths = () => {
+    const yearData = experienceData.week[year];
+    return Object.keys(yearData).map((monthKey) => {
+      const monthData = yearData[monthKey];
+      return (
+        <View key={monthKey} style={styles.monthContainer}>
+          <Text style={styles.monthTitle}>{monthNames[monthKey as keyof typeof monthNames]}</Text>
+          <View style={styles.weeksContainer}>{renderWeeks(monthData)}</View>
+        </View>
+      );
+    });
+  };
+
+  const renderContent = () => {
+    return (
+      <>
+        {/* Header */}
+        <View style={styles.headerCard}>
+          <View style={styles.headerRow}>
+            <View style={styles.headerItem}>
+              <Text style={styles.headerLabel}>소속</Text>
+              <Text style={styles.headerValue}>음성 1센터</Text>
+            </View>
+            <View style={styles.headerItem}>
+              <Text style={styles.headerLabel}>직무 그룹</Text>
+              <Text style={styles.headerValue}>1</Text>
+            </View>
+            <View style={styles.headerItem}>
+              <Text style={styles.headerLabel}>주기</Text>
+              <Text style={styles.headerValue}>주</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Productivity Section */}
+        <View style={styles.productivitySection}>
+          <Text style={styles.productivityTitle}>생산성</Text>
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendCircle, { backgroundColor: '#F16E27' }]} />
+              <Text style={styles.legendText}>맥스</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendCircle, { backgroundColor: '#5698CE' }]} />
+              <Text style={styles.legendText}>미디움</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Year Navigation */}
+        <View style={styles.yearNavigation}>
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() => setYear((prevYear) => Math.max(prevYear - 1, minYear))}
+          >
+            <Text style={styles.navButtonText}>{'<'}</Text>
+          </TouchableOpacity>
+          <Text style={styles.yearText}>{year}</Text>
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() => setYear((prevYear) => Math.min(prevYear + 1, maxYear))}
+          >
+            <Text style={styles.navButtonText}>{'>'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Render Months and Weeks */}
+        <ScrollView>{renderMonths()}</ScrollView>
+      </>
+    );
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title"> quest 페이지입니다</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: 샤랄라~test</ThemedText>
-        {/* <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText> */}
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: 휫짜~</ThemedText>
-        {/* <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText> */}
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: 영원의 꽃~</ThemedText>
-        {/* <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText> */}
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image source={logoImage} style={styles.logo} />
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabNavigation}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === '직무별 퀘스트' && styles.activeTab]}
+          onPress={() => setActiveTab('직무별 퀘스트')}
+        >
+          <Text style={[styles.tabText, activeTab === '직무별 퀘스트' && styles.activeTabText]}>
+            직무별 퀘스트
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === '리더부여 퀘스트' && styles.activeTab]}
+          onPress={() => setActiveTab('리더부여 퀘스트')}
+        >
+          <Text style={[styles.tabText, activeTab === '리더부여 퀘스트' && styles.activeTabText]}>
+            리더부여 퀘스트
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {renderContent()}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: '#fff',
   },
-  stepContainer: {
-    gap: 8,
+  logoContainer: {
+    alignItems: 'flex-start',
+    marginTop: 20,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  logo: {
+    width: 120,
+    height: 45,
+    resizeMode: 'contain',
+    marginLeft: -5,
+  },
+  headerCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginTop: 20,
+    marginBottom: 32,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingTop: 30,
+    paddingBottom: 30,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerLabel: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  headerValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+  },
+  tabNavigation: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  activeTab: {
+    borderBottomColor: '#000',
+    borderBottomWidth: 2,
+  },
+  activeTabText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  productivitySection: {
+    marginTop: 16,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  productivityTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#7B5E2A',
+    marginBottom: 8,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
+  },
+  legendCircle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 4,
+  },
+  legendText: {
+    fontSize: 12,
+    color: '#333',
+  },
+  yearNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  navButton: {
+    borderWidth: 1,
+    borderColor: '#BDBDBD',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  navButtonText: {
+    fontSize: 16,
+    color: '#7B5E2A',
+  },
+  yearText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    color: '#333',
+  },
+  monthContainer: {
+    marginBottom: 24,
+  },
+  monthTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 12,
+  },
+  weeksContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 25,
+  },
+  weekContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  weekCircle: {
+    width: 60, // 기존 50에서 60으로 확대
+    height: 60, // 기존 50에서 60으로 확대
+    borderRadius: 30, // 반지름도 수정
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activeWeekCircle: {
+    backgroundColor: '#5698CE',
+  },
+  inactiveWeekCircle: {
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ccc',
+    borderWidth: 1,
+  },
+  weekLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  activeWeekLabel: {
+    color: '#fff',
+  },
+  experienceText: {
+    marginTop: 8,
+    fontSize: 16,
+    color: '#F16E27',
+  },
+  experienceNumber: {
+    color: '#000', // 검은색
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  experienceUnit: {
+    color: '#F16E27', // 주황색
+    fontWeight: 'normal',
   },
 });
+
+export default QuestScreen;
