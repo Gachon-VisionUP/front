@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import experienceData from '@/data/experienceData';
+import LeaderQuest from '../quest/leader-quest'; // 리더 부여 퀘스트 화면 import
 
 const logoImage = require('../../assets/images/login/Logo.png');
 
@@ -20,10 +21,9 @@ const monthNames = {
 };
 
 const QuestScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('직무별 퀘스트');
+  const [activeTab, setActiveTab] = useState<string>('직무별 퀘스트'); // 탭 전환 상태
   const [year, setYear] = useState<number>(2024);
 
-  // 최소 및 최대 연도
   const minYear = Math.min(...Object.keys(experienceData.week).map(Number));
   const maxYear = Math.max(...Object.keys(experienceData.week).map(Number));
 
@@ -68,62 +68,60 @@ const QuestScreen: React.FC = () => {
   };
 
   const renderContent = () => {
-    return (
-      <>
-        {/* Header */}
-        <View style={styles.headerCard}>
-          <View style={styles.headerRow}>
-            <View style={styles.headerItem}>
-              <Text style={styles.headerLabel}>소속</Text>
-              <Text style={styles.headerValue}>음성 1센터</Text>
-            </View>
-            <View style={styles.headerItem}>
-              <Text style={styles.headerLabel}>직무 그룹</Text>
-              <Text style={styles.headerValue}>1</Text>
-            </View>
-            <View style={styles.headerItem}>
-              <Text style={styles.headerLabel}>주기</Text>
-              <Text style={styles.headerValue}>주</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Productivity Section */}
-        <View style={styles.productivitySection}>
-          <Text style={styles.productivityTitle}>생산성</Text>
-          <View style={styles.legendContainer}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendCircle, { backgroundColor: '#F16E27' }]} />
-              <Text style={styles.legendText}>맥스</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendCircle, { backgroundColor: '#5698CE' }]} />
-              <Text style={styles.legendText}>미디움</Text>
+    if (activeTab === '직무별 퀘스트') {
+      return (
+        <>
+          <View style={styles.headerCard}>
+            <View style={styles.headerRow}>
+              <View style={styles.headerItem}>
+                <Text style={styles.headerLabel}>소속</Text>
+                <Text style={styles.headerValue}>음성 1센터</Text>
+              </View>
+              <View style={styles.headerItem}>
+                <Text style={styles.headerLabel}>직무 그룹</Text>
+                <Text style={styles.headerValue}>1</Text>
+              </View>
+              <View style={styles.headerItem}>
+                <Text style={styles.headerLabel}>주기</Text>
+                <Text style={styles.headerValue}>주</Text>
+              </View>
             </View>
           </View>
-        </View>
-
-        {/* Year Navigation */}
-        <View style={styles.yearNavigation}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setYear((prevYear) => Math.max(prevYear - 1, minYear))}
-          >
-            <Text style={styles.navButtonText}>{'<'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.yearText}>{year}</Text>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setYear((prevYear) => Math.min(prevYear + 1, maxYear))}
-          >
-            <Text style={styles.navButtonText}>{'>'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Render Months and Weeks */}
-        <ScrollView>{renderMonths()}</ScrollView>
-      </>
-    );
+          <View style={styles.productivitySection}>
+            <Text style={styles.productivityTitle}>생산성</Text>
+            <View style={styles.legendContainer}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendCircle, { backgroundColor: '#F16E27' }]} />
+                <Text style={styles.legendText}>맥스</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendCircle, { backgroundColor: '#5698CE' }]} />
+                <Text style={styles.legendText}>미디움</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.yearNavigation}>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => setYear((prevYear) => Math.max(prevYear - 1, minYear))}
+            >
+              <Text style={styles.navButtonText}>{'<'}</Text>
+            </TouchableOpacity>
+            <Text style={styles.yearText}>{year}</Text>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => setYear((prevYear) => Math.min(prevYear + 1, maxYear))}
+            >
+              <Text style={styles.navButtonText}>{'>'}</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView>{renderMonths()}</ScrollView>
+        </>
+      );
+    } else if (activeTab === '리더부여 퀘스트') {
+      // 리더 부여 퀘스트 화면 렌더링
+      return <LeaderQuest />;
+    }
   };
 
   return (
@@ -131,8 +129,6 @@ const QuestScreen: React.FC = () => {
       <View style={styles.logoContainer}>
         <Image source={logoImage} style={styles.logo} />
       </View>
-
-      {/* Tabs */}
       <View style={styles.tabNavigation}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === '직무별 퀘스트' && styles.activeTab]}
@@ -151,11 +147,11 @@ const QuestScreen: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-
       {renderContent()}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -173,6 +169,28 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: 'contain',
     marginLeft: -5,
+  },
+  tabNavigation: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  activeTab: {
+    borderBottomColor: '#000',
+    borderBottomWidth: 2,
+  },
+  activeTabText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
   headerCard: {
     backgroundColor: '#fff',
@@ -211,28 +229,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-  },
-  tabNavigation: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  tabText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  activeTab: {
-    borderBottomColor: '#000',
-    borderBottomWidth: 2,
-  },
-  activeTabText: {
-    color: '#000',
-    fontWeight: 'bold',
   },
   productivitySection: {
     marginTop: 16,
@@ -288,6 +284,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     color: '#333',
   },
+  leaderQuestContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  leaderQuestHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
   monthContainer: {
     marginBottom: 24,
   },
@@ -300,16 +305,16 @@ const styles = StyleSheet.create({
   weeksContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 25,
+    gap: 16,
   },
   weekContainer: {
     alignItems: 'center',
     marginBottom: 16,
   },
   weekCircle: {
-    width: 60, // 기존 50에서 60으로 확대
-    height: 60, // 기존 50에서 60으로 확대
-    borderRadius: 30, // 반지름도 수정
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -340,8 +345,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   experienceUnit: {
-    color: '#F16E27', // 주황색
-    fontWeight: 'normal',
+    color: '#F16E27',
   },
 });
 
