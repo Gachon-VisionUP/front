@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 10,
   },
   infoText: {
     color: 'black',
