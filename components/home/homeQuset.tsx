@@ -21,7 +21,7 @@ export default function HomeQuest() {
         {/* Section 1 */}
         <View style={styles.section}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>음성 1센터</Text>
+            <Text style={styles.badgeText}>월특근</Text>
           </View>
           <View style={styles.spacing} />
           <Text style={styles.questText}>
@@ -32,7 +32,18 @@ export default function HomeQuest() {
         {/* Section 2 */}
         <View style={styles.section}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>직무그룹 1</Text>
+            <Text style={styles.badgeText}>업무개선</Text>
+          </View>
+          <View style={styles.spacing} />
+          <Text style={styles.questText}>
+            1500 <Text style={styles.doText}>do</Text>
+          </Text>
+        </View>
+
+        {/* Section 3 */}
+        <View style={styles.section}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>직무부여</Text>
           </View>
           <View style={styles.spacing} />
           <Text style={styles.questText}>

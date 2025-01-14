@@ -8,33 +8,48 @@ import HomeIcon from "@/components/home/homeIcon";
 import HomeTitle from "@/components/home/homeTitle";
 import HomeExp from '@/components/home/homeExp';
 import HomeQuest from '@/components/home/homeQuset';
+import mypage from '@/assets/images/mypage.png';
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#000000" barStyle="light-content" animated={true} />
       <ImageContainer>
-        {/* Title logo centered */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={Title}
-            resizeMode="contain"
-            style={styles.imageStyle}
-          />
-        </View>
+        {/* 로고 왼쪽 끝 */}
+        <Image
+          source={Title}
+          resizeMode="contain"
+          style={styles.imageStyle}
+        />
 
-        {/* Bell icon on the right */}
-        <Link
-          href={{
-            pathname: "../alarm",
-          }}
-        >
-          <Image
-            source={bell}
-            resizeMode="contain"
-            style={styles.bellImage}
-          />
-        </Link>
+        {/* 아이콘 오른쪽 */}
+        <IconsContainer>
+          {/* 마이페이지 */}
+          <Link
+            href={{
+              pathname: "../mypage",
+            }}
+          >
+            <Image
+              source={mypage}
+              resizeMode="contain"
+              style={styles.mypageIconImage}
+            />
+          </Link>
+
+          {/* 알람 벨 */}
+          <Link
+            href={{
+              pathname: "../alarm",
+            }}
+          >
+            <Image
+              source={bell}
+              resizeMode="contain"
+              style={styles.noticeIconImage}
+            />
+          </Link>
+        </IconsContainer>
       </ImageContainer>
       <HomeIcon />
       <HomeTitle />
@@ -65,18 +80,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   imageStyle: {
-    width: 160, // Adjust logo width
-    height: 70, // Adjust logo height
-    marginLeft: 25,
+    width: 160, // 로고 너비 조정
+    height: 70, // 로고 높이 조정
+    marginRight: 'auto', // 로고를 왼쪽 끝으로 이동
   },
-  bellImage: {
-    width: 30, // Adjust bell width
-    height: 30, // Adjust bell height
+  noticeIconImage: {
+    width: 30, // 아이콘 너비 조정
+    height: 30, // 아이콘 높이 조정
+    paddingLeft: 40,
   },
-  logoContainer: {
-    flex: 1,
-    alignItems: "center", // Center horizontally
-    justifyContent: "center", // Center vertically
+  mypageIconImage: {
+    width: 20, // 아이콘 너비 조정
+    height: 20, // 아이콘 높이 조정
   },
   button: {
     marginTop: 20,
@@ -93,8 +108,14 @@ const styles = StyleSheet.create({
 const ImageContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  justify-content: space-between; /* Logo is centered horizontally */
-  width: 90%; /* Adjust container width */
+  justify-content: space-between;
+  width: 100%; /* 전체 컨테이너 너비를 화면 전체로 설정 */
   margin-top: 30px;
-  padding: 0 10px; /* Add padding for spacing */
+  padding-right: 10px;
+`;
+
+const IconsContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end; /* 아이콘을 오른쪽으로 정렬 */
 `;
