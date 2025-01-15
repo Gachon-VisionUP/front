@@ -11,7 +11,6 @@ import { useIcon } from "@/context/IconContext";
 
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
-
 interface ProfileResponse {
   timestamp: string;
   success: boolean;
@@ -32,15 +31,26 @@ export default function ProfileScreen() {
   const { icon } = useIcon();
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileResponse["result"] | null>(null); // Type the state
+  const [profileData, setProfileData] = useState<ProfileResponse["result"] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await axios.get<ProfileResponse>(`${BASE_URL}/api/users/info`); // Type the response
-        setProfileData(response.data.result);
+        const response = await axios.get<ProfileResponse>(`${BASE_URL}/api/users/info`);
+
+        // Extract valid image name from the response
+        const rawProfileImageUrl = response.data.result.profileImageUrl;
+        const parsedIcon = rawProfileImageUrl.match(/man-\d+|woman-\d+/)?.[0]; // Extract icon name (e.g., "man-03")
+        const validProfileImageUrl = parsedIcon
+          ? `${BASE_URL}/images/${parsedIcon}.png`
+          : `${BASE_URL}/images/default.png`; // Fallback to a default image URL if parsing fails
+
+        setProfileData({
+          ...response.data.result,
+          profileImageUrl: validProfileImageUrl, // Always assign a valid string
+        });
         setIsLoading(false);
       } catch (err) {
         setError("프로필 정보를 불러오는 중 오류가 발생했습니다.");
@@ -124,8 +134,12 @@ export default function ProfileScreen() {
           <Text style={[styles.levelText, { marginTop: 15 }]}>
             LV. {profileData?.level || "레벨 없음"}
           </Text>
-          <Text style={[styles.infoText, { marginTop: 20 }]}>사번: {profileData?.employeeId || "사번 없음"}</Text>
-          <Text style={[styles.infoText, { marginTop: 10 }]}>입사일: {profileData?.joinDate || "입사일 없음"}</Text>
+          <Text style={[styles.infoText, { marginTop: 20 }]}>
+            사번: {profileData?.employeeId || "사번 없음"}
+          </Text>
+          <Text style={[styles.infoText, { marginTop: 10 }]}>
+            입사일: {profileData?.joinDate || "입사일 없음"}
+          </Text>
         </View>
       </View>
 
