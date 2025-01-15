@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import styled from "styled-components/native";
+import axios from "axios"; // axios 추가
 import LoadingScreen from "./loadingScreen"; // 로딩 화면 컴포넌트 가져오기
 import userIcon from "../../assets/images/login/user.png";
 import lockIcon from "../../assets/images/login/lock.png";
 import eyeIcon from "../../assets/images/login/eye.png";
 import eyeOffIcon from "../../assets/images/login/noeye.png";
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080"; // Base URL 환경변수화
 
 export default function InputScreen() {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
@@ -16,37 +19,32 @@ export default function InputScreen() {
 
   const router = useRouter();
 
-  const validateInputs = () => {
-    let valid = true;
-
-    if (username === "admin" && password === "admin") {
-      setError(""); // 관리자 로그인은 에러 없음
-    } else if (username !== "123") {
-      setError("올바른 아이디를 입력해주세요");
-      valid = false;
-    } else if (username === "123" && password !== "123") {
-      setError("비밀번호를 다시 확인해주세요");
-      valid = false;
-    } else {
-      setError("");
+  const handleLogin = async () => {
+    if (!username || !password) {
+      setError("아이디와 비밀번호를 모두 입력해주세요");
+      return;
     }
 
-    return valid;
-  };
+    setIsLoading(true); // 로딩 시작
+    setError(""); // 기존 에러 메시지 초기화
 
-  const handleLogin = async () => {
-    if (validateInputs()) {
-      setIsLoading(true); // 로딩 시작
+    try {
+      const response = await axios.post(`${BASE_URL}/api/users/login`, {
+        loginId: username,
+        password: password,
+      });
 
-      setTimeout(() => {
+      if (response.status === 200) {
         setIsLoading(false); // 로딩 종료
-
-        if (username === "admin" && password === "admin") {
-          router.push("/admin"); // 관리자 페이지로 이동
-        } else {
-          router.push("/home"); // 일반 사용자 페이지로 이동
-        }
-      }, 3000); // 3초 딜레이
+        router.push(username === "admin" ? "/admin" : "/home"); // 관리자와 일반 사용자 구분
+      }
+    } catch (err) {
+      setIsLoading(false); // 로딩 종료
+      if (err.response && err.response.status === 4005) {
+        setError("아이디 또는 비밀번호가 잘못되었습니다");
+      } else {
+        setError("서버와 통신 중 오류가 발생했습니다");
+      }
     }
   };
 

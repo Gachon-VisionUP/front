@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080"; // Base URL 환경변수화
 
 interface LogoutModalProps {
   visible: boolean;
@@ -10,9 +13,23 @@ interface LogoutModalProps {
 const LogoutModal: FC<LogoutModalProps> = ({ visible, onClose }) => {
   const router = useRouter();
 
-  const handleLogout = () => {
-    onClose();
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/users/logout`);
+
+      if (response.status === 200) {
+        Alert.alert('로그아웃 성공', '성공적으로 로그아웃되었습니다.', [
+          { text: '확인', onPress: () => router.push('/login') },
+        ]);
+      } else {
+        Alert.alert('로그아웃 실패', '다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Logout Error:', error);
+      Alert.alert('로그아웃 실패', '서버와의 통신 중 문제가 발생했습니다.');
+    } finally {
+      onClose();
+    }
   };
 
   return (
@@ -95,7 +112,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
 });
 
 export default LogoutModal;
