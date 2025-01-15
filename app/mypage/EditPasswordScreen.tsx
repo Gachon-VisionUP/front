@@ -1,30 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useIcon } from '@/context/IconContext';
+import axios from 'axios';
 import backIcon from '@/assets/images/main/back.png';
 import logo from '@/assets/images/login/Logo.png';
 import eyeIcon from '@/assets/images/login/eye.png';
 import eyeOffIcon from '@/assets/images/login/noeye.png';
 import SuccessModal from "../../components/mypage/SuccessModal";
 
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
+
 export default function EditPasswordScreen() {
     const { icon } = useIcon();
-    const router = useRouter(); 
+    const router = useRouter();
+
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handlePasswordChange = () => {
+    const handlePasswordChange = async () => {
         if (password !== confirmPassword) {
-            setErrorMessage('올바른 정보를 입력해주세요.');
+            setErrorMessage('비밀번호가 일치하지 않습니다.');
             return;
         }
+
         setErrorMessage('');
-        setSuccessModalVisible(true);
+        setIsLoading(true);
+
+        try {
+            const response = await axios.put(`${BASE_URL}/api/users/password`, {
+                changedPW: password,
+                checkPW: confirmPassword,
+            });
+
+            if (response.status === 200) {
+                setSuccessModalVisible(true);
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 400) {
+                setErrorMessage('비밀번호 변경 요청이 잘못되었습니다.');
+            } else {
+                setErrorMessage('서버와 통신 중 오류가 발생했습니다.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -94,15 +119,22 @@ export default function EditPasswordScreen() {
                     !(password && confirmPassword) && styles.disabledButton,
                 ]}
                 onPress={handlePasswordChange}
-                disabled={!password || !confirmPassword}
+                disabled={!password || !confirmPassword || isLoading}
             >
-                <Text style={styles.submitButtonText}>비밀번호 변경하기</Text>
+                {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                    <Text style={styles.submitButtonText}>비밀번호 변경하기</Text>
+                )}
             </TouchableOpacity>
 
             {/* Success Modal */}
             <SuccessModal
                 visible={isSuccessModalVisible}
-                onClose={() => setSuccessModalVisible(false)}
+                onClose={() => {
+                    setSuccessModalVisible(false);
+                    router.push('/mypage');
+                }}
             />
         </View>
     );
@@ -123,11 +155,6 @@ const styles = StyleSheet.create({
     backIcon: {
         width: 24,
         height: 24,
-    },
-    logo: {
-        width: 100,
-        height: 30,
-        resizeMode: 'contain',
     },
     profileSection: {
         alignItems: 'center',
