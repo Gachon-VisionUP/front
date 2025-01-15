@@ -4,6 +4,7 @@ import { Svg, Circle } from 'react-native-svg';
 import exp from '@/assets/images/main/exp.png';
 import { LinearGradient } from "expo-linear-gradient";
 
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function HomeExp() {
   const circleRadius = 50;
