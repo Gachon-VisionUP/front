@@ -14,11 +14,11 @@ const LeaderQuestDetail: React.FC = () => {
   // 월 데이터
   const monthData = [
     { month: '1월', count: 7, experience: 100, color: '#F16E27' },
-    { month: '2월', count: 0, experience: 0, color: '#E0E0E0' },
-    { month: '3월', count: 0, experience: 0, color: '#E0E0E0' },
+    { month: '2월', count: 3, experience: 50, color: '#5698CE' },
+    { month: '3월', count: 5, experience: 67, color: '#5698CE' },
     { month: '4월', count: 0, experience: 0, color: '#E0E0E0' },
     { month: '5월', count: 4, experience: 50, color: '#5698CE' },
-    { month: '6월', count: 0, experience: 0, color: '#E0E0E0' },
+    { month: '6월', count: 7, experience: 100, color: '#F16E27' },
     { month: '7월', count: 0, experience: 0, color: '#E0E0E0' },
     { month: '8월', count: 0, experience: 0, color: '#E0E0E0' },
     { month: '9월', count: 0, experience: 0, color: '#E0E0E0' },
@@ -302,4 +302,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LeaderQuestDetail;
+export default LeaderQuestDetail; 

@@ -22,9 +22,6 @@ const LeaderQuestHeader: React.FC = () => {
   const questList = [
     { title: '월특근', unit: '월 / 단위', id: 'monthly' },
     { title: '업무개선', unit: '주 / 단위', id: 'weekly' },
-    { title: '퀘스트 이름', unit: '월 / 단위', id: 'quest' },
-    { title: '퀘스트 이름', unit: '주 / 단위', id: 'extra1' },
-    { title: '퀘스트 이름', unit: '월 / 단위', id: 'extra2' },
   ];
 
   // 표시할 퀘스트 개수 (기본적으로 3개만 표시)
@@ -118,41 +115,42 @@ const LeaderQuestHeader: React.FC = () => {
       </View>
 
       {/* 각 퀘스트별 현황 박스 */}
-      {questList.map((quest, questIndex) => (
-        <View key={questIndex} style={styles.questBox}>
-          {/* 제목 부분 */}
-          <TouchableOpacity onPress={() => navigateToDetail()}>
-            <Text style={styles.questBoxTitle}>{quest.title} {'>'}</Text>
-          </TouchableOpacity>
+      {questList
+  .filter((quest) => (isMonthly && quest.id === 'monthly') || (!isMonthly && quest.id === 'weekly'))
+  .map((quest, questIndex) => (
+    <View key={questIndex} style={styles.questBox}>
+      {/* 제목 부분 */}
+      <TouchableOpacity onPress={() => navigateToDetail()}>
+        <Text style={styles.questBoxTitle}>{quest.title} {'>'}</Text>
+      </TouchableOpacity>
 
-          {/* 주별 전환 시 월 텍스트 추가 */}
-          {!isMonthly && (
-            <Text style={styles.monthLabel}>{`${questIndex + 1}월`}</Text>
-          )}
+      {/* 주별 전환 시 월 텍스트 추가 */}
+      {!isMonthly && <Text style={styles.monthLabel}>{`${questIndex + 1}월`}</Text>}
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.monthContainer}>
-              {(isMonthly ? monthData : weekData).map((data, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.monthBox,
-                    data.status === 'max'
-                      ? styles.max
-                      : data.status === 'medium'
-                      ? styles.medium
-                      : styles.empty,
-                  ]}
-                >
-                  <Text style={styles.monthText}>
-                    {'month' in data ? data.month : data.week}
-                  </Text>
-                </View>
-              ))}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={styles.monthContainer}>
+          {(isMonthly ? monthData : weekData).map((data, index) => (
+            <View
+              key={index}
+              style={[
+                styles.monthBox,
+                data.status === 'max'
+                  ? styles.max
+                  : data.status === 'medium'
+                  ? styles.medium
+                  : styles.empty,
+              ]}
+            >
+              <Text style={styles.monthText}>
+                {'month' in data ? data.month : data.week}
+              </Text>
             </View>
-          </ScrollView>
+          ))}
         </View>
-      ))}
+      </ScrollView>
+    </View>
+  ))}
+
     </ScrollView>
   );
 };

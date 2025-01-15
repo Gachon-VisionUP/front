@@ -317,8 +317,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1,
     width: 130,
-    transform: [{ translateX: -40 }],
+    transform: [{ translateX: - 65}],
     textAlign: "center",
+    marginRight: 20,
+
   },
   percentage: {
     fontSize: 30,

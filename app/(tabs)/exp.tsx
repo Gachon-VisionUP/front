@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import ExpStatus from '../../components/exp/ExpStatus';
-import ExpGrowth from '../../components/exp/ExpGrowth';
+import ExpStatus from '../exp/exp-status';
+import ExpGrowth from '../exp/exp-growth';
 
 const logoImage = require('../../assets/images/login/Logo.png');
 const graphIcon = require('../../assets/images/exp/graph.png');
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   dropdownToggle: {
     height: 40,
-    width: 140,
+    width: 120,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -258,8 +258,9 @@ const styles = StyleSheet.create({
   },
   dropdownList: {
     position: 'absolute',
-    top: 50,
-    width: 140,
+    top: 42,
+    width: 120,
+    left: 222,
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,

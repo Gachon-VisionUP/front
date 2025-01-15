@@ -31,12 +31,14 @@ export default function ExpGraph2() {
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState("2024년");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [displayText, setDisplayText] = useState(""); // 고정 텍스트 상태
+  const [displayText, setDisplayText] = useState("섹션을 클릭하세요"); // 고정 텍스트 상태
   const router = useRouter();
 
   const handleSectionPress = (index: number) => {
     setSelectedSection(index === selectedSection ? null : index);
-    setDisplayText(`${sectionsData[index].value.toLocaleString()} do`); // 클릭한 섹션의 텍스트 업데이트
+    setDisplayText(
+      index === selectedSection ? "섹션을 클릭하세요" : `${sectionsData[index].value.toLocaleString()} do`
+    ); // 클릭한 섹션의 텍스트 업데이트
   };
 
   const renderChartSections = () => {
@@ -121,13 +123,11 @@ export default function ExpGraph2() {
       </View>
 
       <View style={styles.chartContainer}>
-        {/* 항상 차트 상단 중앙에 텍스트 표시 */}
-        <Text style={styles.fixedText}>{displayText || "섹션을 클릭하세요"}</Text>
-        <Svg width={chartSize} height={chartSize}>
-          {renderChartSections()}
-        </Svg>
-        <Text style={styles.totalText}>{total.toLocaleString()} do</Text>
+        {/* 선택된 섹션 경험치 표시 */}
+        <Text style={styles.centralText}>{displayText}</Text>
+        <Svg width={chartSize} height={chartSize}>{renderChartSections()}</Svg>
         <Text style={styles.chartLabel}>{selectedYear} 누적 경험치</Text>
+        <Text style={styles.totalText}>{total.toLocaleString()} do</Text>
       </View>
 
       <View style={styles.legend}>
@@ -206,25 +206,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 20,
   },
-  fixedText: {
+  centralText: {
     position: "absolute",
-    top: -30, // 텍스트를 차트 상단으로 이동
-    fontSize: 16,
+    top: chartSize / 2 - 18, // 중앙 위치
+    fontSize: 20,
     fontWeight: "bold",
     color: "#000",
     textAlign: "center",
+  },
+  chartLabel: {
+    fontSize: 16,
+    color: "#555",
+    marginTop: 20,
   },
   totalText: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
-    position: "absolute",
-    top: chartSize / 2 - 18,
-  },
-  chartLabel: {
-    fontSize: 16,
-    color: "#555",
-    marginTop: 10,
+    marginTop: 5,
   },
   legend: {
     marginTop: 20,
