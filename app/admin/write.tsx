@@ -5,6 +5,7 @@ import backIcon from '@/assets/images/main/back.png';
 import { useRouter } from 'expo-router';
 import SaveModal from '../../components/admin/SaveModal';
 import axios from 'axios';
+import * as Notifications from 'expo-notifications';
 
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || 'http://35.216.61.56:8080';
 
@@ -13,6 +14,17 @@ const WritePost: React.FC = () => {
   const [content, setContent] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const router = useRouter();
+
+  // ✅ 알림 전송
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '새로운 글 게시',
+        body: '관리자가 새로운 글을 작성하였습니다.',
+      },
+      trigger: null, // 즉시 보내려면 'trigger'에 'null'을 설정
+    });
+  };
 
   const handleSave = async () => {
     try {
@@ -24,6 +36,7 @@ const WritePost: React.FC = () => {
       if (response.status === 200 && response.data.success) {
         console.log('Post Saved:', { title, content });
         setModalVisible(true);
+        sendNotification();
       } else {
         console.error('Failed to save post:', response.data.message);
         alert('글 저장에 실패했습니다. 다시 시도해주세요.');
