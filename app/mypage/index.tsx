@@ -35,30 +35,38 @@ export default function ProfileScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const fetchProfileData = async () => {
+    try {
+      const response = await axios.get<ProfileResponse>(`${BASE_URL}/api/users/info`);
+
+      // Extract valid image name from the response
+      const rawProfileImageUrl = response.data.result.profileImageUrl;
+      const parsedIcon = rawProfileImageUrl.match(/man-\d+|woman-\d+/)?.[0];
+      const validProfileImageUrl = parsedIcon
+        ? `${BASE_URL}/images/${parsedIcon}.png`
+        : `${BASE_URL}/images/default.png`;
+
+      setProfileData({
+        ...response.data.result,
+        profileImageUrl: validProfileImageUrl,
+      });
+      setIsLoading(false);
+    } catch (err) {
+      setError("프로필 정보를 불러오는 중 오류가 발생했습니다.");
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await axios.get<ProfileResponse>(`${BASE_URL}/api/users/info`);
-
-        // Extract valid image name from the response
-        const rawProfileImageUrl = response.data.result.profileImageUrl;
-        const parsedIcon = rawProfileImageUrl.match(/man-\d+|woman-\d+/)?.[0]; // Extract icon name (e.g., "man-03")
-        const validProfileImageUrl = parsedIcon
-          ? `${BASE_URL}/images/${parsedIcon}.png`
-          : `${BASE_URL}/images/default.png`; // Fallback to a default image URL if parsing fails
-
-        setProfileData({
-          ...response.data.result,
-          profileImageUrl: validProfileImageUrl, // Always assign a valid string
-        });
-        setIsLoading(false);
-      } catch (err) {
-        setError("프로필 정보를 불러오는 중 오류가 발생했습니다.");
-        setIsLoading(false);
-      }
-    };
-
+    // Fetch data initially
     fetchProfileData();
+
+    // Polling mechanism to refresh data every 60 seconds
+    const interval = setInterval(() => {
+      fetchProfileData();
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   const handleLogoutPress = () => {

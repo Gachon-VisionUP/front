@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useIcon } from '@/context/IconContext';
@@ -12,7 +12,7 @@ import SuccessModal from "../../components/mypage/SuccessModal";
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function EditPasswordScreen() {
-    const { icon } = useIcon();
+    const { icon, setIcon } = useIcon();
     const router = useRouter();
 
     const [password, setPassword] = useState('');
@@ -22,6 +22,41 @@ export default function EditPasswordScreen() {
     const [errorMessage, setErrorMessage] = useState('');
     const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // New state for fetched profile data
+    const [profileData, setProfileData] = useState<{
+        name: string;
+        profileImageUrl: string;
+    } | null>(null);
+
+    // Fetch profile data from API
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/api/users/info`);
+                const result = response.data.result;
+
+                // Extract valid icon URL from profileImageUrl
+                const rawImageUrl = result.profileImageUrl;
+                const parsedIcon = rawImageUrl.match(/man-\d+|woman-\d+/)?.[0];
+                const validImageUrl = parsedIcon
+                    ? `${BASE_URL}/images/${parsedIcon}.png`
+                    : `${BASE_URL}/images/default.png`;
+
+                // Update state with fetched data
+                setProfileData({
+                    name: result.name,
+                    profileImageUrl: validImageUrl,
+                });
+
+                setIcon(validImageUrl); // Update global icon if needed
+            } catch (error) {
+                Alert.alert('오류', '프로필 데이터를 가져오는 데 실패했습니다.');
+            }
+        };
+
+        fetchProfileData();
+    }, []);
 
     const handlePasswordChange = async () => {
         if (password !== confirmPassword) {
@@ -66,8 +101,11 @@ export default function EditPasswordScreen() {
 
             {/* Profile Icon and Name */}
             <View style={styles.profileSection}>
-                <Image source={icon} style={styles.profileIcon} />
-                <Text style={styles.userName}>박나영님</Text>
+                <Image
+                    source={{ uri: profileData?.profileImageUrl || icon }}
+                    style={styles.profileIcon}
+                />
+                <Text style={styles.userName}>{profileData?.name || '사용자 이름'}</Text>
             </View>
 
             {/* Password Inputs */}
