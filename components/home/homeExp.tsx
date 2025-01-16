@@ -1,16 +1,58 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
 import exp from '@/assets/images/main/exp.png';
 import { LinearGradient } from "expo-linear-gradient";
+import axios from 'axios';
 
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function HomeExp() {
   const circleRadius = 50;
   const strokeWidth = 10;
-  const progressPercentage = 75;
   const circumference = 2 * Math.PI * circleRadius;
+
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/home`);
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0681E7" />
+      </View>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>데이터를 불러오지 못했습니다.</Text>
+      </View>
+    );
+  }
+
+  const {
+    latestExpDate = "없음",
+    latestExp = 0,
+    totalExp = 0,
+    nextLevelExpRequirement = 1,
+  } = userData;
+
+  const progressPercentage = Math.min((totalExp / nextLevelExpRequirement) * 100, 100);
   const progressStroke = (progressPercentage / 100) * circumference;
 
   return (
@@ -22,13 +64,13 @@ export default function HomeExp() {
         <View style={styles.headerContainer}>
           <Image source={exp} style={styles.icon} />
           <Text style={styles.headerText}>최신경험치</Text>
-          <Text style={styles.dateText}>25.01.04 기준</Text>
+          <Text style={styles.dateText}>{latestExpDate}</Text>
         </View>
         <View style={styles.contentContainer}>
           <View>
             <Text style={styles.expText}>
               <Text style={styles.expTextWhite}>+ </Text>
-              <Text style={styles.expTextNumber}>2500 </Text>
+              <Text style={styles.expTextNumber}>{latestExp} </Text>
               <Text style={styles.expTextOrange}>do</Text>
             </Text>
           </View>
@@ -56,7 +98,7 @@ export default function HomeExp() {
               />
             </Svg>
             <View style={styles.circleTextContainer}>
-              <Text style={styles.circleText}>10,500</Text>
+              <Text style={styles.circleText}>{totalExp}</Text>
             </View>
           </View>
         </View>
@@ -95,17 +137,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  labelContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.22)',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  labelText: {
-    color: 'white',
-    fontSize: 14,
-  },
   expText: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -120,7 +151,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 32,
     fontWeight: 'bold',
-    opacity: 1
+    opacity: 1,
   },
   expTextOrange: {
     color: '#FD8568',
@@ -150,5 +181,22 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  errorText: {
+    color: '#ff0000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
