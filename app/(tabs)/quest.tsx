@@ -1,89 +1,131 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import experienceData from '@/data/experienceData';
-import LeaderQuest from '../quest/leader-quest'; // 리더 부여 퀘스트 화면 import
+import axios from 'axios';
+import LeaderQuest from '../quest/leader-quest';
 
 const logoImage = require('../../assets/images/login/Logo.png');
 
-const monthNames = {
-  January: '1월',
-  February: '2월',
-  March: '3월',
-  April: '4월',
-  May: '5월',
-  June: '6월',
-  July: '7월',
-  August: '8월',
-  September: '9월',
-  October: '10월',
-  November: '11월',
-  December: '12월',
-};
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
+
+const monthKeys = [
+  '1월', '2월', '3월', '4월', '5월',
+  '6월', '7월', '8월', '9월', '10월',
+  '11월', '12월'
+];
+
+interface Quest {
+  department: string;
+  part: number;
+  cycle: string;
+  round: number;
+  grantedExp: number;
+  questGrade: string;
+  grantedDate: string;
+}
 
 const QuestScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('직무별 퀘스트'); // 탭 전환 상태
   const [year, setYear] = useState<number>(2024);
+  const [questData, setQuestData] = useState<Quest[]>([]);
 
-  const minYear = Math.min(...Object.keys(experienceData.week).map(Number));
-  const maxYear = Math.max(...Object.keys(experienceData.week).map(Number));
-
-  const renderWeeks = (monthData: { [key: string]: { experience: number } }) => {
-    return Object.keys(monthData).map((weekKey) => {
-      const week = monthData[weekKey];
-      const isActive = week.experience > 0;
-      return (
-        <View key={weekKey} style={styles.weekContainer}>
-          <View
-            style={[
-              styles.weekCircle,
-              isActive ? styles.activeWeekCircle : styles.inactiveWeekCircle,
-            ]}
-          >
-            <Text style={[styles.weekLabel, isActive && styles.activeWeekLabel]}>
-              {weekKey.replace('Week', '')}주차
-            </Text>
-          </View>
-          {isActive && (
-            <Text style={styles.experienceText}>
-              <Text style={styles.experienceNumber}>+{week.experience}</Text>{' '}
-              <Text style={styles.experienceUnit}>do</Text>
-            </Text>
-          )}
-        </View>
-      );
-    });
+  const fetchQuestData = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/team-quest/job`, {
+        params: { year },
+      });
+      setQuestData(response.data);
+    } catch (error) {
+      console.error('Failed to fetch quest data:', error);
+    }
   };
 
-  const renderMonths = () => {
-    const yearData = experienceData.week[year];
-    return Object.keys(yearData).map((monthKey) => {
-      const monthData = yearData[monthKey];
-      return (
-        <View key={monthKey} style={styles.monthContainer}>
-          <Text style={styles.monthTitle}>{monthNames[monthKey as keyof typeof monthNames]}</Text>
-          <View style={styles.weeksContainer}>{renderWeeks(monthData)}</View>
+  useEffect(() => {
+    fetchQuestData();
+  }, [year]);
+
+  const renderWeeks = () => {
+    const weeksPerMonth = [4, 4, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4];
+    let weekCounter = 1;
+
+    return weeksPerMonth.map((weeksInMonth, monthIndex) => (
+      <View key={monthIndex} style={styles.monthContainer}>
+        <Text style={styles.monthTitle}>{[monthKeys[monthIndex]]}</Text>
+        <View style={styles.weeksContainer}>
+          {Array.from({ length: weeksInMonth }, (_, i) => {
+            if (weekCounter > 52) return null;
+
+            const quest = questData.find(
+              (q) =>
+                q.round === weekCounter &&
+                new Date(q.grantedDate).getFullYear() === year
+            );
+
+            const isActive = !!quest;
+            const circleColor = quest?.questGrade === 'MAX' ? '#F16E27' : '#5698CE';
+
+            const currentWeek = weekCounter;
+            weekCounter++;
+
+            return (
+              <View key={currentWeek} style={styles.weekContainer}>
+                <View
+                  style={[
+                    styles.weekCircle,
+                    isActive && { backgroundColor: circleColor },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.weekLabel,
+                      isActive && styles.activeWeekLabel,
+                    ]}
+                  >
+                    {currentWeek}주차
+                  </Text>
+                </View>
+                {isActive && (
+                  <Text style={styles.experienceText}>
+                    <Text style={styles.experienceNumber}>+{quest?.grantedExp}</Text>{' '}
+                    <Text style={styles.experienceUnit}>do</Text>
+                  </Text>
+                )}
+              </View>
+            );
+          })}
         </View>
-      );
-    });
+      </View>
+    ));
   };
 
   const renderContent = () => {
     if (activeTab === '직무별 퀘스트') {
+      // department를 변환하는 로직 추가
+      const departmentRaw = questData[0]?.department || 'N/A';
+      const department =
+        departmentRaw === 'EUMSEONG1'
+          ? '음성 1센터'
+          : departmentRaw === 'EUMSEONG2'
+          ? '음성 2센터'
+          : departmentRaw;
+  
+      const part = questData[0]?.part || 'N/A';
+      const cycle = questData[0]?.cycle === 'WEEKLY' ? '주' : questData[0]?.cycle || 'N/A';
+  
       return (
         <>
           <View style={styles.headerCard}>
             <View style={styles.headerRow}>
               <View style={styles.headerItem}>
                 <Text style={styles.headerLabel}>소속</Text>
-                <Text style={styles.headerValue}>음성 1센터</Text>
+                <Text style={styles.headerValue}>{department}</Text>
               </View>
               <View style={styles.headerItem}>
                 <Text style={styles.headerLabel}>직무 그룹</Text>
-                <Text style={styles.headerValue}>1</Text>
+                <Text style={styles.headerValue}>{part}</Text>
               </View>
               <View style={styles.headerItem}>
                 <Text style={styles.headerLabel}>주기</Text>
-                <Text style={styles.headerValue}>주</Text>
+                <Text style={styles.headerValue}>{cycle}</Text>
               </View>
             </View>
           </View>
@@ -103,23 +145,22 @@ const QuestScreen: React.FC = () => {
           <View style={styles.yearNavigation}>
             <TouchableOpacity
               style={styles.navButton}
-              onPress={() => setYear((prevYear) => Math.max(prevYear - 1, minYear))}
+              onPress={() => setYear((prevYear) => Math.max(prevYear - 1, 2020))}
             >
               <Text style={styles.navButtonText}>{'<'}</Text>
             </TouchableOpacity>
             <Text style={styles.yearText}>{year}</Text>
             <TouchableOpacity
               style={styles.navButton}
-              onPress={() => setYear((prevYear) => Math.min(prevYear + 1, maxYear))}
+              onPress={() => setYear((prevYear) => prevYear + 1)}
             >
               <Text style={styles.navButtonText}>{'>'}</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView>{renderMonths()}</ScrollView>
+          <ScrollView>{renderWeeks()}</ScrollView>
         </>
       );
     } else if (activeTab === '리더부여 퀘스트') {
-      // 리더 부여 퀘스트 화면 렌더링
       return <LeaderQuest />;
     }
   };
@@ -134,7 +175,9 @@ const QuestScreen: React.FC = () => {
           style={[styles.tabButton, activeTab === '직무별 퀘스트' && styles.activeTab]}
           onPress={() => setActiveTab('직무별 퀘스트')}
         >
-          <Text style={[styles.tabText, activeTab === '직무별 퀘스트' && styles.activeTabText]}>
+          <Text
+            style={[styles.tabText, activeTab === '직무별 퀘스트' && styles.activeTabText]}
+          >
             직무별 퀘스트
           </Text>
         </TouchableOpacity>
@@ -142,16 +185,18 @@ const QuestScreen: React.FC = () => {
           style={[styles.tabButton, activeTab === '리더부여 퀘스트' && styles.activeTab]}
           onPress={() => setActiveTab('리더부여 퀘스트')}
         >
-          <Text style={[styles.tabText, activeTab === '리더부여 퀘스트' && styles.activeTabText]}>
+          <Text
+            style={[styles.tabText, activeTab === '리더부여 퀘스트' && styles.activeTabText]}
+          >
             리더부여 퀘스트
           </Text>
         </TouchableOpacity>
       </View>
+
       {renderContent()}
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -230,6 +275,78 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
   },
+  monthContainer: {
+    marginBottom: 20,
+  },
+  monthTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  weeksContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  weekContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  weekCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ccc',
+    borderWidth: 1,
+  },
+  weekLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  activeWeekLabel: {
+    color: '#fff',
+  },
+  experienceText: {
+    marginTop: 8,
+    fontSize: 16,
+    color: '#F16E27',
+  },
+  experienceNumber: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  experienceUnit: {
+    color: '#F16E27',
+  },
+  yearNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  navButton: {
+    borderWidth: 1,
+    borderColor: '#BDBDBD',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  navButtonText: {
+    fontSize: 16,
+    color: '#7B5E2A',
+  },
+  yearText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    color: '#333',
+  },
   productivitySection: {
     marginTop: 16,
     marginBottom: 16,
@@ -260,92 +377,6 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#333',
-  },
-  yearNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  navButton: {
-    borderWidth: 1,
-    borderColor: '#BDBDBD',
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  navButtonText: {
-    fontSize: 16,
-    color: '#7B5E2A',
-  },
-  yearText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginHorizontal: 16,
-    color: '#333',
-  },
-  leaderQuestContainer: {
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  leaderQuestHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  monthContainer: {
-    marginBottom: 24,
-  },
-  monthTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-  },
-  weeksContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-  },
-  weekContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  weekCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activeWeekCircle: {
-    backgroundColor: '#5698CE',
-  },
-  inactiveWeekCircle: {
-    backgroundColor: '#f0f0f0',
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-  weekLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  activeWeekLabel: {
-    color: '#fff',
-  },
-  experienceText: {
-    marginTop: 8,
-    fontSize: 16,
-    color: '#F16E27',
-  },
-  experienceNumber: {
-    color: '#000', // 검은색
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  experienceUnit: {
-    color: '#F16E27',
   },
 });
 
