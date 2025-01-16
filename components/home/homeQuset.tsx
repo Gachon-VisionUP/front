@@ -1,9 +1,52 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import questIcon from '@/assets/images/main/quest.png';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
+import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
+import questIcon from "@/assets/images/main/quest.png";
+
+interface Quest {
+  questName: string;
+  grantedExp: number;
+}
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function HomeQuest() {
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/home`);
+        setQuests(response.data.quests || []);
+        setIsLoading(false);
+      } catch (err) {
+        setError("데이터를 불러오는 중 오류가 발생했습니다.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={[styles.card, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.card, styles.loadingContainer]}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={["#5698CE", "#0681E7"]}
@@ -17,35 +60,23 @@ export default function HomeQuest() {
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        {/* Section 1 */}
-        <View style={styles.section}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>월특근</Text>
+        {quests.map((quest, index) => (
+          <View style={styles.section} key={index}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {quest.questName || "없음"}
+              </Text>
+            </View>
+            <Text style={styles.questText}>
+              + {quest.grantedExp || 0} <Text style={styles.doText}>do</Text>
+            </Text>
           </View>
-          <Text style={styles.questText}>
-            + 1300 <Text style={styles.doText}>do</Text>
-          </Text>
-        </View>
+        ))}
 
-        {/* Section 2 */}
-        <View style={styles.section}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>업무개선</Text>
-          </View>
-          <Text style={styles.questText}>
-            + 1500 <Text style={styles.doText}>do</Text>
-          </Text>
-        </View>
-
-        {/* Section 3 */}
-        <View style={styles.section}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>직무부여</Text>
-          </View>
-          <Text style={styles.questText}>
-            + 1500 <Text style={styles.doText}>do</Text>
-          </Text>
-        </View>
+        {/* If quests array is empty */}
+        {quests.length === 0 && (
+          <Text style={styles.noQuestsText}>퀘스트가 없습니다.</Text>
+        )}
       </View>
     </LinearGradient>
   );
@@ -57,12 +88,12 @@ const styles = StyleSheet.create({
     padding: 15,
     width: 350,
     height: 150,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginTop: 10,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 2,
   },
   icon: {
@@ -71,42 +102,56 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   headerText: {
-    color: 'white',
+    color: "white",
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   contentContainer: {
     flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   section: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
     paddingHorizontal: 20,
   },
   badge: {
-    backgroundColor: '#71A9F7',
+    backgroundColor: "#71A9F7",
     borderRadius: 8,
     paddingVertical: 5,
     paddingHorizontal: 15,
     opacity: 0.8,
   },
   badgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   questText: {
-    color: 'white',
+    color: "white",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   doText: {
-    color: '#FD8568',
+    color: "#FD8568",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  noQuestsText: {
+    fontSize: 16,
+    color: "white",
+    textAlign: "center",
+    marginTop: 30,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
   },
 });

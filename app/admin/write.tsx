@@ -4,6 +4,9 @@ import Title from '@/assets/images/login/Logo.png';
 import backIcon from '@/assets/images/main/back.png';
 import { useRouter } from 'expo-router';
 import SaveModal from '../../components/admin/SaveModal';
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || 'http://35.216.61.56:8080';
 
 const WritePost: React.FC = () => {
   const [title, setTitle] = useState<string>('');
@@ -11,9 +14,24 @@ const WritePost: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSave = () => {
-    console.log('Post Saved:', { title, content, date: new Date().toISOString().slice(0, 10) });
-    setModalVisible(true);
+  const handleSave = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/posts/add`, {
+        title,
+        body: content,
+      });
+
+      if (response.status === 200 && response.data.success) {
+        console.log('Post Saved:', { title, content });
+        setModalVisible(true);
+      } else {
+        console.error('Failed to save post:', response.data.message);
+        alert('글 저장에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Error while saving post:', error);
+      alert('글 저장 중 오류가 발생했습니다.');
+    }
   };
 
   const handleCloseModal = () => {

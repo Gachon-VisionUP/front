@@ -1,11 +1,22 @@
 import React, { useState } from "react";
-import styled from 'styled-components/native';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import styled from "styled-components/native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import SuccessModal from "@/components/admin/SuccessModal";
-import { useRouter } from 'expo-router';
-import backIcon from '@/assets/images/main/back.png';
-import Title from '@/assets/images/login/Logo.png';
+import { useRouter } from "expo-router";
+import backIcon from "@/assets/images/main/back.png";
+import Title from "@/assets/images/login/Logo.png";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
@@ -13,43 +24,60 @@ const RegisterScreen: React.FC = () => {
   const [team, setTeam] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [password, setPassword] = useState<string>("1111"); // Default password
   const [year, setYear] = useState<string>("");
   const [month, setMonth] = useState<string>("");
   const [day, setDay] = useState<string>("");
-  const [level, setLevel] = useState<string>("");
+  const [jobGroup, setJobGroup] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!department) newErrors.department = "올바른 정보를 입력하세요";
-    if (!team) newErrors.team = "올바른 정보를 입력하세요";
-    if (!id) newErrors.id = "올바른 정보를 입력하세요";
-    if (!name) newErrors.name = "올바른 정보를 입력하세요";
-    if (!year || !month || !day) newErrors.date = "올바른 입사일을 선택하세요";
-    if (!level) newErrors.level = "올바른 레벨을 선택하세요";
-    if (!username) newErrors.username = "아이디를 입력하세요";
-
-
-    if (!password) {
-      setPassword("1111");
-      console.log("비밀번호 미입력 -> 기본값 1111로 설정");
-    }
+    if (!department) newErrors.department = "부서를 선택해주세요";
+    if (!team) newErrors.team = "소속을 선택해주세요";
+    if (!id) newErrors.id = "사번을 입력해주세요";
+    if (!name) newErrors.name = "이름을 입력해주세요";
+    if (!year || !month || !day) newErrors.date = "올바른 입사일을 선택해주세요";
+    if (!jobGroup) newErrors.jobGroup = "직군을 선택해주세요";
+    if (!username) newErrors.username = "아이디를 입력해주세요";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // 모든 입력란이 유효하면 처리 로직 실행
-      setModalVisible(true);
-      console.log('등록하기 눌림');
+      const joinDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+
+      const payload = {
+        department,
+        part: parseInt(team), // Convert team to number
+        employeeId: id,
+        name,
+        joinDate,
+        jobGroup,
+        loginId: username,
+        password,
+      };
+
+      try {
+        const response = await axios.post(`${BASE_URL}/api/admins/create`, payload);
+
+        if (response.status === 200) {
+          setModalVisible(true);
+          Alert.alert("성공", "구성원이 성공적으로 등록되었습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        console.log(payload);
+        Alert.alert("오류", "구성원 등록 중 오류가 발생했습니다.");
+      }
     }
   };
 
   const handleModalClose = () => {
     setModalVisible(false);
+    router.back();
   };
 
   return (
@@ -151,29 +179,21 @@ const RegisterScreen: React.FC = () => {
           {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
         </View>
 
-        {/* 레벨 */}
+        {/* 직군 */}
         <View style={styles.formGroup}>
-          <Text style={styles.label}>레벨</Text>
+          <Text style={styles.label}>직군</Text>
           <Picker
             style={styles.picker}
-            selectedValue={level}
-            onValueChange={(value) => setLevel(value)}
+            selectedValue={jobGroup}
+            onValueChange={(value) => setJobGroup(value)}
           >
-            <Picker.Item label="레벨을 선택해주세요" value="" />
-            <Picker.Item label="F1 - I" value="1" />
-            <Picker.Item label="F1 - II" value="2" />
-            <Picker.Item label="F2 - I" value="3" />
-            <Picker.Item label="F2 - II" value="4" />
-            <Picker.Item label="F2 - III" value="5" />
-            <Picker.Item label="F3 - I" value="6" />
-            <Picker.Item label="F3 - II" value="7" />
-            <Picker.Item label="F3 - III" value="8" />
-            <Picker.Item label="F4 - I" value="9" />
-            <Picker.Item label="F4 - II" value="10" />
-            <Picker.Item label="F4 - III" value="11" />
-            <Picker.Item label="F5" value="12" />
+            <Picker.Item label="직군을 선택해주세요" value="" />
+            <Picker.Item label="현장직군" value="현장직군" />
+            <Picker.Item label="관리직군" value="관리직군" />
+            <Picker.Item label="성장전략" value="성장전략" />
+            <Picker.Item label="기술직군" value="기술직군" />
           </Picker>
-          {errors.level && <Text style={styles.errorText}>{errors.level}</Text>}
+          {errors.jobGroup && <Text style={styles.errorText}>{errors.jobGroup}</Text>}
         </View>
 
         {/* 아이디 */}
@@ -195,6 +215,7 @@ const RegisterScreen: React.FC = () => {
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
             secureTextEntry={true}
+            onChangeText={(text) => setPassword(text)}
           />
           <Text style={styles.passwordHint}>*비밀번호 미입력시, 1111 자동 저장</Text>
         </View>
@@ -205,10 +226,7 @@ const RegisterScreen: React.FC = () => {
         </TouchableOpacity>
 
         {/* Success Modal */}
-        <SuccessModal
-          visible={modalVisible}
-          onClose={handleModalClose}
-        />
+        <SuccessModal visible={modalVisible} onClose={handleModalClose} />
       </View>
     </ScrollView>
   );

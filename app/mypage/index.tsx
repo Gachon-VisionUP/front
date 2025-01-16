@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
+import axios from "axios";
 import LogoutModal from "../../components/mypage/LogoutModal";
 import EditInfoModal from "../../components/mypage/EditInfoModal";
 import backIcon from "@/assets/images/main/back.png";
@@ -8,11 +9,64 @@ import logo from "@/assets/images/login/Logo.png";
 import miniLogo from "@/assets/images/mypage/Logo2.png";
 import { useIcon } from "@/context/IconContext";
 
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
+
+interface ProfileResponse {
+  timestamp: string;
+  success: boolean;
+  code: string;
+  result: {
+    profileImageUrl: string;
+    name: string;
+    employeeId: string;
+    department: string;
+    joinDate: string;
+    level: string;
+  };
+  message: string;
+}
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { icon } = useIcon();
-  const [isLogoutModalVisible, setLogoutModalVisible] = React.useState(false);
-  const [isEditInfoModalVisible, setEditInfoModalVisible] = React.useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileResponse["result"] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await axios.get<ProfileResponse>(`${BASE_URL}/api/users/info`);
+
+      // Extract valid image name from the response
+      const rawProfileImageUrl = response.data.result.profileImageUrl;
+      const parsedIcon = rawProfileImageUrl.match(/man-\d+|woman-\d+/)?.[0];
+      const validProfileImageUrl = parsedIcon
+        ? `${BASE_URL}/images/${parsedIcon}.png`
+        : `${BASE_URL}/images/default.png`;
+
+      setProfileData({
+        ...response.data.result,
+        profileImageUrl: validProfileImageUrl,
+      });
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch data initially
+    fetchProfileData();
+
+    // Polling mechanism to refresh data every 60 seconds
+    const interval = setInterval(() => {
+      fetchProfileData();
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
 
   const handleLogoutPress = () => {
     setLogoutModalVisible(true);
@@ -40,6 +94,22 @@ export default function ProfileScreen() {
     console.log("Editing Password...");
   };
 
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -59,18 +129,24 @@ export default function ProfileScreen() {
         </View>
         <View style={styles.profileContent}>
           {/* Global Icon */}
-          <Image source={icon} style={styles.profileImage} />
+          <Image source={{ uri: profileData?.profileImageUrl }} style={styles.profileImage} />
           <View style={styles.nameRow}>
-            <Text
-              style={[styles.nameText, { color: "#344BFD", fontSize: 24, fontWeight: "bold" }]}
-            >
-              김민수
+            <Text style={[styles.nameText, { color: "#344BFD", fontSize: 24, fontWeight: "bold" }]}>
+              {profileData?.name || "이름 없음"}
             </Text>
-            <Text style={[styles.centerText, { marginLeft: 10 }]}>음성1센터 (1)</Text>
+            <Text style={[styles.centerText, { marginLeft: 10 }]}>
+              {profileData?.department || "부서 없음"}
+            </Text>
           </View>
-          <Text style={[styles.levelText, { marginTop: 15 }]}>LV. FI - I</Text>
-          <Text style={[styles.infoText, { marginTop: 20 }]}>사번: 2023010101</Text>
-          <Text style={[styles.infoText, { marginTop: 10 }]}>입사일: 2023. 01. 01</Text>
+          <Text style={[styles.levelText, { marginTop: 15 }]}>
+            LV. {profileData?.level || "레벨 없음"}
+          </Text>
+          <Text style={[styles.infoText, { marginTop: 20 }]}>
+            사번: {profileData?.employeeId || "사번 없음"}
+          </Text>
+          <Text style={[styles.infoText, { marginTop: 10 }]}>
+            입사일: {profileData?.joinDate || "입사일 없음"}
+          </Text>
         </View>
       </View>
 
@@ -114,11 +190,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     marginRight: 10,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#344BFD",
   },
   cardContainer: {
     backgroundColor: "#FFF",
@@ -202,5 +273,13 @@ const styles = StyleSheet.create({
   profileContent: {
     marginTop: 120,
     alignItems: "center",
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
   },
 });

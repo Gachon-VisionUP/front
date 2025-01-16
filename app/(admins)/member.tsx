@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,44 +6,88 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import axios from "axios";
 import logo from "@/assets/images/login/Logo.png";
-import membersData, { Member } from "@/data/membersData";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 const itemsPerPage = 8;
 
+interface Member {
+  userId: number;
+  department: string;
+  part: number;
+  employeeId: string;
+  userName: string;
+}
+
 const MemberScreen: React.FC = () => {
-  const [department, setDepartment] = useState<string>(""); // 부서 선택
-  const [team, setTeam] = useState<string>(""); // 소속 선택
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [department, setDepartment] = useState<string>(""); // Selected department
+  const [team, setTeam] = useState<string>(""); // Selected team
+  const [allMembers, setAllMembers] = useState<Member[]>([]); // Complete member data
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]); // Filtered data
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current page
+  const [totalPages, setTotalPages] = useState<number>(1); // Total pages
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
   const router = useRouter();
 
-  // 필터링된 데이터
-  const filteredData = membersData.filter((member) => {
-    const departmentMatch = department === "" || member.department === department;
-    const teamMatch = team === "" || member.team === team;
-    return departmentMatch && teamMatch;
-  });
+  // Fetch members from the API
+  const fetchMembers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/admins/user-list`);
+      const { userInfoList } = response.data.result;
+      setAllMembers(userInfoList);
+      setFilteredMembers(userInfoList); // Initially, all members are displayed
+      setTotalPages(Math.ceil(userInfoList.length / itemsPerPage));
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch member data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // Apply filters
+  useEffect(() => {
+    const filtered = allMembers.filter(
+      (member) =>
+        (department === "" || member.department === department) &&
+        (team === "" || member.part.toString() === team)
+    );
+    setFilteredMembers(filtered);
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+    setCurrentPage(1); // Reset to the first page on filter change
+  }, [department, team, allMembers]);
 
+  // Use focus effect to refresh data on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchMembers(); // Refresh data when the screen is focused
+    }, [])
+  );
+
+  // Paginate the filtered data
+  const paginatedMembers = filteredMembers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Handle pagination change
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+  // Handle row press to navigate to MemberDetail
   const handleRowPress = (member: Member) => {
     router.push({
       pathname: "/admin/MemberDetail",
-      params: { id: member.id },
+      params: { id: member.userId.toString() }, // Pass the ID as a string
     });
   };
 
@@ -57,23 +101,18 @@ const MemberScreen: React.FC = () => {
       <View style={styles.dropdownContainer}>
         <Picker
           selectedValue={department}
-          onValueChange={(itemValue: string) => {
-            setDepartment(itemValue);
-            setCurrentPage(1); // 드롭다운 변경 시 첫 페이지로 초기화
-          }}
+          onValueChange={(value) => setDepartment(value)}
           style={styles.dropdown}
         >
           <Picker.Item label="부서 선택" value="" />
           <Picker.Item label="음성 1센터" value="음성 1센터" />
           <Picker.Item label="음성 2센터" value="음성 2센터" />
+          <Picker.Item label="사업기획팀" value="사업기획팀" />
         </Picker>
 
         <Picker
           selectedValue={team}
-          onValueChange={(itemValue: string) => {
-            setTeam(itemValue);
-            setCurrentPage(1); // 드롭다운 변경 시 첫 페이지로 초기화
-          }}
+          onValueChange={(value) => setTeam(value)}
           style={styles.dropdown}
         >
           <Picker.Item label="소속 선택" value="" />
@@ -90,44 +129,47 @@ const MemberScreen: React.FC = () => {
           <Text style={styles.tableHeaderText}>사번</Text>
           <Text style={styles.tableHeaderText}>이름</Text>
         </View>
-        {paginatedData.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.tableRow}
-            onPress={() => handleRowPress(item)}
-          >
-            <Text style={styles.tableRowText}>{item.department}</Text>
-            <Text style={styles.tableRowText}>{item.team}</Text>
-            <Text style={styles.tableRowText}>{item.id}</Text>
-            <Text style={styles.tableRowText}>{item.name}</Text>
-          </TouchableOpacity>
-        ))}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#1C6CF9" />
+        ) : (
+          paginatedMembers.map((member) => (
+            <TouchableOpacity
+              key={member.userId}
+              style={styles.tableRow}
+              onPress={() => handleRowPress(member)}
+            >
+              <Text style={styles.tableRowText}>{member.department}</Text>
+              <Text style={styles.tableRowText}>{member.part}</Text>
+              <Text style={styles.tableRowText}>{member.employeeId}</Text>
+              <Text style={styles.tableRowText}>{member.userName}</Text>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
 
       {/* Pagination Section */}
-      <View style={styles.paginationContainer}>
-        <TouchableOpacity onPress={() => handlePageChange(currentPage - 1)}>
-          <Text style={styles.paginationText}>&lt;</Text>
-        </TouchableOpacity>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <TouchableOpacity
-            key={i}
-            onPress={() => handlePageChange(i + 1)}
-          >
-            <Text
-              style={[
-                styles.paginationText,
-                currentPage === i + 1 && styles.activePageText,
-              ]}
-            >
-              {i + 1}
-            </Text>
+      {totalPages > 1 && (
+        <View style={styles.paginationContainer}>
+          <TouchableOpacity onPress={() => handlePageChange(currentPage - 1)}>
+            <Text style={styles.paginationText}>&lt;</Text>
           </TouchableOpacity>
-        ))}
-        <TouchableOpacity onPress={() => handlePageChange(currentPage + 1)}>
-          <Text style={styles.paginationText}>&gt;</Text>
-        </TouchableOpacity>
-      </View>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <TouchableOpacity key={i} onPress={() => handlePageChange(i + 1)}>
+              <Text
+                style={[
+                  styles.paginationText,
+                  currentPage === i + 1 && styles.activePageText,
+                ]}
+              >
+                {i + 1}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity onPress={() => handlePageChange(currentPage + 1)}>
+            <Text style={styles.paginationText}>&gt;</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Buttons Section */}
       <View style={styles.buttonContainer}>

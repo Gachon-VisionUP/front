@@ -1,27 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function HomeTitle() {
   const router = useRouter();
+  const [userData, setUserData] = useState({
+    userName: '',
+    level: '',
+    totalExp: 0,
+    latestExp: 0,
+    imageUrl: '',
+    quests: [],
+  });
+
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/home`);
+        if (response.status === 200) {
+          setUserData(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching home data:', error);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
 
   return (
     <Container>
-      <Text style={styles.levelText}>LV. F1 - I</Text>
+      <Text style={styles.levelText}>LV. {userData.level}</Text>
       <Text style={styles.welcomeText}>
-        <Text style={styles.nameText}>박나영</Text>님 환영합니다
+        <Text style={styles.nameText}>{userData.userName}</Text>님 환영합니다
       </Text>
       <Text style={styles.supportText}>당신의 빛나는 내일을 두핸즈가 응원합니다</Text>
-
-      {/* 내 정보 확인하기 버튼 */}
-      {/* @ts-ignore
-      <TouchableOpacity
-        onPress={() => router.push('/mypage' as any)} // 경로 이동
-        style={styles.button}
-      >
-        <Text style={styles.infoText}>내 정보 확인하기 &gt;</Text>
-      </TouchableOpacity> */}
     </Container>
   );
 }
