@@ -1,48 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import backIcon from "@/assets/images/main/back.png";
-import Title from "@/assets/images/login/Logo.png";
+import axios from 'axios';
+import backIcon from '@/assets/images/main/back.png';
+import Title from '@/assets/images/login/Logo.png';
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || 'http://35.216.61.56:8080';
 
 const PostDetail = () => {
-  const { id, title, description, date } = useLocalSearchParams();
+  const { id } = useLocalSearchParams(); // postId from route params
   const router = useRouter();
+  const [post, setPost] = useState<{ title: string; body: string; date: string } | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const initialData = [
-    { id: '181', title: 'DDD 공지사항', description: '중요 공지, 신청 마감 ~07/20', date: '2024.07.20' },
-    { id: '182', title: 'CCC 이벤트', description: '경험치 300 do, 신청 마감 ~08/15', date: '2024.08.15' },
-    { id: '183', title: 'BBB 프로젝트 추가', description: '신청 마감 ~09/30', date: '2024.09.30' },
-    { id: '184', title: 'AAA 프로젝트 신설', description: '경험치 500 do, 신청 마감 ~10/15', date: '2024.10.07' },
-    { id: '185', title: '잡초이스 공고', description: '신청 마감 ~11/20', date: '2024.11.04' },
-  ];
-
-  const currentIndex = initialData.findIndex((post) => post.id === id);
-
-  const handleNavigation = (direction: 'previous' | 'next') => {
-    if (direction === 'previous' && currentIndex > 0) {
-      const previousPost = initialData[currentIndex - 1];
-      router.push({
-        pathname: '/post/[id]',
-        params: {
-          id: previousPost.id,
-          title: previousPost.title,
-          description: previousPost.description,
-          date: previousPost.date,
-        },
-      });
-    } else if (direction === 'next' && currentIndex < initialData.length - 1) {
-      const nextPost = initialData[currentIndex + 1];
-      router.push({
-        pathname: '/post/[id]',
-        params: {
-          id: nextPost.id,
-          title: nextPost.title,
-          description: nextPost.description,
-          date: nextPost.date,
-        },
-      });
+  // Fetch post details
+  const fetchPostDetails = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/posts/${id}`);
+      setPost(response.data.result);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch post details.');
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) fetchPostDetails();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#1C6CF9" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -60,30 +54,17 @@ const PostDetail = () => {
       <View style={styles.detailContainer}>
         <View style={styles.detailRow}>
           <Text style={styles.itemId}>{id}</Text>
-          <Text style={styles.itemTitle}>{title}</Text>
+          <Text style={styles.itemTitle}>{post?.title}</Text>
         </View>
-        <Text style={styles.itemDate}>날짜: {date}</Text>
+        <Text style={styles.itemDate}>날짜: {post?.date}</Text>
         <View style={styles.contentContainer}>
-          <Text style={styles.contentText}>{description}</Text>
+          <Text style={styles.contentText}>{post?.body}</Text>
         </View>
       </View>
 
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>첨부파일</Text>
-        <View style={styles.pagination}>
-          <TouchableOpacity onPress={() => handleNavigation('previous')} disabled={currentIndex === 0}>
-            <Text style={[styles.paginationText, currentIndex === 0 && styles.disabledText]}>
-              ◀ 이전글
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.separator}/>{/* Separator */}
-          <TouchableOpacity onPress={() => handleNavigation('next')} disabled={currentIndex === initialData.length - 1}>
-            <Text style={[styles.paginationText, currentIndex === initialData.length - 1 && styles.disabledText]}>
-              다음글 ▶
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
@@ -153,20 +134,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    paddingTop: 10,
-  },
-  paginationText: {
-    fontSize: 14,
-    color: '#1C6CF9',
-  },
-  disabledText: {
-    color: '#ddd',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -181,12 +148,6 @@ const styles = StyleSheet.create({
     width: 140,
     height: 50,
     resizeMode: 'contain',
-  },
-  separator: {
-    width: 1,
-    height: '100%',
-    backgroundColor: '#ddd',
-    marginHorizontal: 10,
   },
 });
 
