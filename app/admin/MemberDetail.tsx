@@ -1,45 +1,99 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import membersData from "@/data/membersData";
-import backIcon from '@/assets/images/main/back.png';
-import Title from '@/assets/images/login/Logo.png';
-import styled from 'styled-components/native';
-import { useRouter } from 'expo-router';
+import backIcon from "@/assets/images/main/back.png";
+import Title from "@/assets/images/login/Logo.png";
+import styled from "styled-components/native";
+import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import EditSuccessModal from "@/components/admin/EditSuccessModal";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 const MemberDetail: React.FC = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
-  const member = membersData.find((m) => m.id === id);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [department, setDepartment] = useState<string>("");
+  const [team, setTeam] = useState<number | string>("");
+  const [idValue, setIdValue] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [hireDate, setHireDate] = useState<string>("");
+  const [level, setLevel] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  if (!member) {
+  // Fetch member data from API
+  const fetchMemberData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`${BASE_URL}/api/admins/user-info/${id}`);
+      const result = response.data.result;
+
+      setDepartment(result.department);
+      setTeam(result.part);
+      setIdValue(result.employeeId);
+      setName(result.userName);
+      setHireDate(result.joinDate);
+      setLevel(result.jobGroup);
+      setUsername(result.loginId);
+      setPassword(result.changedPW);
+    } catch (error) {
+      Alert.alert("Error", "구성원 정보를 가져오는 데 실패했습니다.");
+      router.back();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Update member data API
+  const updateMemberData = async () => {
+    try {
+      const payload = {
+        department,
+        part: team,
+        employeeId: idValue,
+        name: name,
+        joinDate: hireDate,
+        jobGroup: level,
+        loginId: username,
+        changedPW: password,
+      };
+
+      await axios.put(`${BASE_URL}/api/admins/user-info/${id}`, payload);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "구성원 정보를 수정하는 데 실패했습니다.");
+    }
+  };
+
+  const handleSave = () => {
+    updateMemberData();
+  };
+
+  useEffect(() => {
+    fetchMemberData();
+  }, [id]);
+
+  if (isLoading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>구성원을 찾을 수 없습니다.</Text>
+        <ActivityIndicator size="large" color="#1C6CF9" />
       </View>
     );
   }
-
-  const [department, setDepartment] = useState(member.department);
-  const [team, setTeam] = useState(member.team);
-  const [idValue, setIdValue] = useState(member.id);
-  const [name, setName] = useState(member.name);
-  const [hireYear, setHireYear] = useState(member.hireDate.year);
-  const [hireMonth, setHireMonth] = useState(member.hireDate.month);
-  const [hireDay, setHireDay] = useState(member.hireDate.day);
-  const [level, setLevel] = useState(member.level);
-  const [username, setUsername] = useState(member.username);
-  const [password, setPassword] = useState(member.password);
-
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const handleSave = () => {
-    // 수정 저장 로직 추가
-    setModalVisible(true);
-  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -75,8 +129,8 @@ const MemberDetail: React.FC = () => {
             onValueChange={(value) => setTeam(value)}
           >
             <Picker.Item label="소속을 선택해주세요" value="" />
-            <Picker.Item label="1" value="1" />
-            <Picker.Item label="2" value="2" />
+            <Picker.Item label="1" value={1} />
+            <Picker.Item label="2" value={2} />
           </Picker>
         </View>
 
@@ -105,40 +159,12 @@ const MemberDetail: React.FC = () => {
         {/* 입사일 */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>입사일</Text>
-          <View style={styles.dateContainer}>
-            <Picker
-              style={styles.yearPicker}
-              selectedValue={hireYear}
-              onValueChange={(value) => setHireYear(Number(value))}
-            >
-              <Picker.Item label="년" value="" />
-              {[...Array(30)].map((_, i) => (
-                <Picker.Item key={i} label={(2000 + i).toString()} value={2000 + i} />
-              ))}
-            </Picker>
-
-            <Picker
-              style={styles.datePicker}
-              selectedValue={hireMonth}
-              onValueChange={(value) => setHireMonth(Number(value))}
-            >
-              <Picker.Item label="월" value="" />
-              {Array.from({ length: 12 }, (_, i) => (
-                <Picker.Item key={i + 1} label={(i + 1).toString()} value={i + 1} />
-              ))}
-            </Picker>
-
-            <Picker
-              style={styles.datePicker}
-              selectedValue={hireDay}
-              onValueChange={(value) => setHireDay(Number(value))}
-            >
-              <Picker.Item label="일" value="" />
-              {Array.from({ length: 31 }, (_, i) => (
-                <Picker.Item key={i + 1} label={(i + 1).toString()} value={i + 1} />
-              ))}
-            </Picker>
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="입사일을 입력해주세요"
+            value={hireDate}
+            onChangeText={setHireDate}
+          />
         </View>
 
         {/* 레벨 */}
@@ -150,18 +176,9 @@ const MemberDetail: React.FC = () => {
             onValueChange={(value) => setLevel(value)}
           >
             <Picker.Item label="레벨을 선택해주세요" value="" />
-            <Picker.Item label="F1-I" value="F1-I" />
-            <Picker.Item label="F1-II" value="F1-II" />
-            <Picker.Item label="F2-I" value="F2-I" />
-            <Picker.Item label="F2-II" value="F2-II" />
-            <Picker.Item label="F2-III" value="F2-III" />
-            <Picker.Item label="F3-I" value="F3-I" />
-            <Picker.Item label="F3-II" value="F3-II" />
-            <Picker.Item label="F3-III" value="F3-III" />
-            <Picker.Item label="F4-I" value="F4-I" />
-            <Picker.Item label="F4-II" value="F4-II" />
-            <Picker.Item label="F4-III" value="F4-III" />
-            <Picker.Item label="F5" value="F5" />
+            <Picker.Item label="기술직군" value="기술직군" />
+            <Picker.Item label="관리직군" value="관리직군" />
+            <Picker.Item label="성장전략" value="성장전략" />
           </Picker>
         </View>
 
@@ -175,7 +192,7 @@ const MemberDetail: React.FC = () => {
             onChangeText={setUsername}
           />
         </View>
-        
+
         {/* 비밀번호 */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>비밀번호</Text>
@@ -188,7 +205,7 @@ const MemberDetail: React.FC = () => {
         </View>
 
         {/* 저장 버튼 */}
-        <View style={styles.buttonContainer} >
+        <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
             <Text style={styles.buttonText}>수정하기</Text>
           </TouchableOpacity>
@@ -201,7 +218,6 @@ const MemberDetail: React.FC = () => {
             router.back();
           }}
         />
-
       </View>
     </ScrollView>
   );
@@ -291,6 +307,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1C6CF9",
     borderRadius: 8,
     alignItems: "center",
+    width: "100%",
   },
 });
 

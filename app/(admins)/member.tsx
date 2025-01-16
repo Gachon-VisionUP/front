@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
 import logo from "@/assets/images/login/Logo.png";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 const itemsPerPage = 8;
@@ -63,6 +63,13 @@ const MemberScreen: React.FC = () => {
     setCurrentPage(1); // Reset to the first page on filter change
   }, [department, team, allMembers]);
 
+  // Use focus effect to refresh data on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchMembers(); // Refresh data when the screen is focused
+    }, [])
+  );
+
   // Paginate the filtered data
   const paginatedMembers = filteredMembers.slice(
     (currentPage - 1) * itemsPerPage,
@@ -80,14 +87,9 @@ const MemberScreen: React.FC = () => {
   const handleRowPress = (member: Member) => {
     router.push({
       pathname: "/admin/MemberDetail",
-      params: { id: member.userId },
+      params: { id: member.userId.toString() }, // Pass the ID as a string
     });
   };
-
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchMembers();
-  }, []);
 
   return (
     <View style={styles.container}>
