@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Image,
   StatusBar,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Title from "../../assets/images/login/Logo.png";
@@ -14,81 +16,64 @@ import backIcon from "../../assets/images/main/back.png";
 import { LinearGradient } from "expo-linear-gradient";
 import graph from "@/assets/images/navigation/graph.png";
 import pencil from "@/assets/images/navigation/pencil.png";
+import axios from "axios";
 
-// Sample Data
-const data = [
-  {
-    id: "1",
-    title: "AAA 프로젝트 신설 \n(신청 마감 ~10/31)",
-    content: "",
-    date: "2025.01.04",
-  },
-  {
-    id: "2",
-    title: "잡초이스 공고 \n(신청 마감 ~11/20)",
-    content: "",
-    date: "2025.01.04",
-  },
-  {
-    id: "3",
-    title: "최신 경험치",
-    content: "2500 do",
-    date: "직무 퀘스트 | 2025.01.04",
-  },
-  {
-    id: "4",
-    title: "최신 경험치",
-    content: "1700 do",
-    date: "전사 프로젝트 | 2025.01.04",
-  },
-  {
-    id: "5",
-    title: "AAA 프로젝트 신설 \n(신청 마감 ~10/31)",
-    content: "",
-    date: "2025.01.04",
-  },
-  {
-    id: "6",
-    title: "잡초이스 공고\n (신청 마감 ~11/20)",
-    content: "",
-    date: "2025.01.04",
-  },
-  {
-    id: "7",
-    title: "최신 경험치",
-    content: "2500 do",
-    date: "상반기 인사결과 | 2025.01.04",
-  },
-  {
-    id: "8",
-    title: "최신 경험치",
-    content: "1700 do",
-    date: "하반기 인사결과 | 2025.01.04",
-  },
-];
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
+
+// Define the type for notifications
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  read: boolean;
+  type: string;
+  createdAt: string;
+}
 
 export default function AlarmScreen() {
   const router = useRouter();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const renderContent = (content: string) => {
-    const parts = content.split("do"); // Split the string by "do"
-    return (
-      <Text style={[styles.cardContent, { color: "#ffffff" }]}>
-        {parts.map((part, index) => (
-          <Text key={index}>
-            {part}
-            {index < parts.length - 1 && (
-              <Text style={styles.highlightedText}>do</Text>
-            )}
-          </Text>
-        ))}
-      </Text>
-    );
+  // Fetch notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get<Notification[]>(
+          `${BASE_URL}/api/notifications/unread`
+        );
+        setNotifications(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        Alert.alert("오류", "알림 데이터를 가져오는 데 실패했습니다.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  // Handle marking a notification as read
+  const handleMarkAsRead = async (notificationId: number) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/notifications/${notificationId}/read`
+      );
+
+      if (response.status === 200) {
+        // Remove the notification from the list after marking as read
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter((notification) => notification.id !== notificationId)
+        );
+      }
+    } catch (error) {
+      Alert.alert("오류", "알림을 삭제하는 데 실패했습니다.");
+    }
   };
 
-  const renderItem = ({ item }: any) => {
-    // Determine the icon based on the title content
-    const iconSource = item.title.includes("경험치") ? graph : pencil;
+  const renderItem = ({ item }: { item: Notification }) => {
+    // Determine the icon based on the notification type
+    const iconSource = item.type === "경험치" ? graph : pencil;
 
     return (
       <LinearGradient
@@ -98,19 +83,31 @@ export default function AlarmScreen() {
         <View style={styles.cardHeader}>
           {/* Icon and Title */}
           <View style={styles.titleWithIcon}>
-            <Image source={iconSource} style={[styles.icon, { tintColor: "#FFF" }]} />
-            <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>{item.title}</Text>
+            <Image
+              source={iconSource}
+              style={[styles.icon, { tintColor: "#FFF" }]}
+            />
+            <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>
+              {item.title}
+            </Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => handleMarkAsRead(item.id)}>
             <Text style={[styles.deleteButton, { color: "#FFFFFF" }]}>X</Text>
           </TouchableOpacity>
         </View>
         {/* Content */}
-        {renderContent(item.content)}
-        <Text style={styles.cardDate}>{item.date}</Text>
+        <Text style={styles.cardDate}>{new Date(item.createdAt).toLocaleString()}</Text>
       </LinearGradient>
     );
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -126,14 +123,14 @@ export default function AlarmScreen() {
 
       {/* Filter Section */}
       <View style={styles.filterSection}>
-        <Text style={styles.filterText}>전체 {data.length}개</Text>
+        <Text style={styles.filterText}>전체 {notifications.length}개</Text>
       </View>
 
       {/* FlatList */}
       <FlatList
-        data={data}
+        data={notifications}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         style={{
@@ -183,10 +180,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
   },
-  filterButton: {
-    fontSize: 18,
-    color: "#666",
-  },
   listContent: {
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -227,16 +220,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
   },
-  cardContent: {
-    fontSize: 24,
-    color: "#E0E0E0",
-    marginBottom: 10,
-  },
-  highlightedText: {
-    color: "#FF8A6D",
-  },
   cardDate: {
     fontSize: 12,
     color: "#D6D6D6",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
