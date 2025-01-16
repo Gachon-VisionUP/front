@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { Svg, Path, G, Text as SvgText } from "react-native-svg";
+import { Svg, Path, G } from "react-native-svg";
 import { useRouter } from "expo-router";
+
+type SectionData = {
+  label: string;
+  value: number;
+  color: string;
+};
 
 const screenWidth = Dimensions.get("window").width;
 const chartSize = screenWidth * 0.6; // 차트 크기
@@ -18,34 +24,90 @@ const donutWidth = 20; // 도넛 그래프의 두께
 const backIcon = require("../../assets/images/exp/back.png");
 const logoImage = require("../../assets/images/login/Logo.png");
 
-const sectionsData = [
-  { label: "상반기 인사평가", value: 1500, color: "#FF5C35" },
-  { label: "하반기 인사평가", value: 3000, color: "#F59E0B" },
-  { label: "직무별 퀘스트", value: 2640, color: "#3B82F6" },
-  { label: "리더 부여 퀘스트", value: 517, color: "#10B981" },
-  { label: "전사 프로젝트", value: 0, color: "#6366F1" },
-];
+const baseUrl = "http://35.216.61.56"; // 백엔드 기본 URL
 
 export default function ExpGraph2() {
-  const total = sectionsData.reduce((sum, section) => sum + section.value, 0); // 전체 값
+  const [sectionsData, setSectionsData] = useState<SectionData[]>([
+    { label: "상반기 인사평가", value: 200, color: "#FF5C35" },
+    { label: "하반기 인사평가", value: 30, color: "#F59E0B" },
+    { label: "직무별 퀘스트", value: 40, color: "#3B82F6" },
+    { label: "리더 부여 퀘스트", value: 0, color: "#10B981" },
+    { label: "전사 프로젝트", value: 0, color: "#6366F1" },
+  ]);
+
+  const [filteredData, setFilteredData] = useState<SectionData[]>([]);
+  const [levelName, setLevelName] = useState("F1-I"); // 현재 레벨
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
-  const [selectedYear, setSelectedYear] = useState("2024년");
+  const [selectedYear, setSelectedYear] = useState("2025");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [displayText, setDisplayText] = useState("섹션을 클릭하세요"); // 고정 텍스트 상태
+  const [displayText, setDisplayText] = useState("섹션을 클릭하세요");
   const router = useRouter();
 
+  useEffect(() => {
+    const filtered = sectionsData.filter((section) => section.value > 0);
+    setFilteredData(filtered);
+  }, [sectionsData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("[LOG] Fetching data for year:", selectedYear);
+      try {
+        const response = await fetch(
+          `${baseUrl}:8080/api/exp-bar/ring/year?sessionUserId=1&year=${selectedYear}`
+        );
+        console.log("[LOG] API response status:", response.status);
+        if (!response.ok) {
+          throw new Error("API 요청 실패");
+        }
+        const result = await response.json();
+        console.log("[LOG] API response data:", result);
+
+        setLevelName(result.levelName);
+        const updatedSections = sectionsData.map((section) => ({
+          ...section,
+          value: result.expByType[section.label] || 0,
+        }));
+        setSectionsData(updatedSections);
+      } catch (error) {
+        console.error("[LOG] 서버 연동 실패:", error);
+      }
+    };
+
+    fetchData();
+  }, [selectedYear]);
+
+  const total = filteredData.reduce((sum, section) => sum + section.value, 0);
+
   const handleSectionPress = (index: number) => {
-    setSelectedSection(index === selectedSection ? null : index);
-    setDisplayText(
-      index === selectedSection ? "섹션을 클릭하세요" : `${sectionsData[index].value.toLocaleString()} do`
-    ); // 클릭한 섹션의 텍스트 업데이트
+    if (index === selectedSection) {
+      setSelectedSection(null);
+      setDisplayText("섹션을 클릭하세요");
+    } else {
+      setSelectedSection(index);
+      setDisplayText(
+        `${filteredData[index].label}\n${filteredData[index].value.toLocaleString()} do`
+      );
+    }
   };
 
   const renderChartSections = () => {
+    if (filteredData.length === 0 || total === 0) {
+      return (
+        <Text style={styles.chartLabel}>
+          표시할 데이터가 없습니다. (총합: {total})
+        </Text>
+      );
+    }
+
     let cumulativePercentage = 0;
 
-    return sectionsData.map((section, index) => {
+    return filteredData.map((section, index) => {
       const percentage = (section.value / total) * 100;
+
+      if (!isFinite(percentage)) {
+        return null;
+      }
+
       const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
       cumulativePercentage += percentage;
       const endAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
@@ -55,7 +117,7 @@ export default function ExpGraph2() {
 
       const outerRadius = chartSize / 2;
       const innerRadius =
-        chartSize / 2 - donutWidth - (selectedSection === index ? 10 : 0); // 안쪽 확대
+        chartSize / 2 - donutWidth - (selectedSection === index ? 10 : 0);
 
       const largeArc = percentage > 50 ? 1 : 0;
 
@@ -103,27 +165,27 @@ export default function ExpGraph2() {
 
       <View style={styles.levelContainer}>
         <View style={styles.levelInfo}>
-          <Text style={styles.subtitle}>오늘의 나의 레벨</Text>
-          <Text style={styles.levelText}>F1-I</Text>
+        <Text style={styles.subtitle}>{selectedYear} 나의 레벨</Text>
+          <Text style={styles.levelText}>{levelName}</Text>
         </View>
         <DropDownPicker
           open={isDropdownOpen}
           value={selectedYear}
           items={[
-            { label: "2024년", value: "2024년" },
-            { label: "2023년", value: "2023년" },
-            { label: "2022년", value: "2022년" },
+            { label: "2025년", value: "2025" },
+            { label: "2024년", value: "2024" },
+            { label: "2023년", value: "2023" },
+            { label: "2022년", value: "2022" },
           ]}
           setOpen={setIsDropdownOpen}
           setValue={setSelectedYear}
-          style={[styles.dropdown, { width: 90, height: 30, paddingHorizontal: 8 }]}
+          style={[styles.dropdown, { width: 100, height: 30, paddingHorizontal: 8 }]}
           textStyle={{ fontSize: 12 }}
-          dropDownContainerStyle={[styles.dropdownContainer, { width: 90 }]}
+          dropDownContainerStyle={[styles.dropdownContainer, { width: 100 }]}
         />
       </View>
 
       <View style={styles.chartContainer}>
-        {/* 선택된 섹션 경험치 표시 */}
         <Text style={styles.centralText}>{displayText}</Text>
         <Svg width={chartSize} height={chartSize}>{renderChartSections()}</Svg>
         <Text style={styles.chartLabel}>{selectedYear} 누적 경험치</Text>
@@ -131,7 +193,7 @@ export default function ExpGraph2() {
       </View>
 
       <View style={styles.legend}>
-        {sectionsData.map((section, index) => (
+        {filteredData.map((section, index) => (
           <View style={styles.legendItem} key={index}>
             <View style={[styles.legendDot, { backgroundColor: section.color }]} />
             <Text style={styles.legendText}>{section.label}</Text>
@@ -208,8 +270,8 @@ const styles = StyleSheet.create({
   },
   centralText: {
     position: "absolute",
-    top: chartSize / 2 - 18, // 중앙 위치
-    fontSize: 20,
+    top: chartSize / 2 - 30, // 중앙 위치
+    fontSize: 18,
     fontWeight: "bold",
     color: "#000",
     textAlign: "center",
@@ -236,15 +298,14 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   legendDot: {
-    marginLeft: 10,
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginRight: 10,
+    marginRight: 20,
+    marginLeft: 20,
   },
   legendText: {
-    marginLeft: 8,
-    fontSize: 14,
+    fontSize: 20,
     color: "#555",
   },
 });
