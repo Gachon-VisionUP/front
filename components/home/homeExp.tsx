@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
 import exp from '@/assets/images/main/exp.png';
 import { LinearGradient } from "expo-linear-gradient";
 import axios from 'axios';
+import * as Notifications from 'expo-notifications';
 
 const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
@@ -14,18 +15,35 @@ export default function HomeExp() {
 
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const notificationSent = useRef(false);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/home`);
+      setUserData(response.data);
+
+      if (!notificationSent.current) {
+        await sendNotification();
+        notificationSent.current = true;
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '경험치를 획득했습니다!',
+        body: '축하합니다! 최신 경험치 정보를 확인하세요.',
+      },
+      trigger: null, 
+    });
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/api/home`);
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user data", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchUserData();
   }, []);
 
