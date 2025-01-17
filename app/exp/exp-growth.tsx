@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from "react-native";
 
 const flagIcon = require("../../assets/images/exp/flag.png");
@@ -10,12 +10,12 @@ interface GrowthData {
   currentLevel: string;
   nextLevel: string;
   yearComparison: {
-    type: string;
-    label: string;
-    percentage: number;
-    experience: number;
-    totalExperience: number;
-    year: string;
+    type: "top" | "bottom"; // 프론트 고정
+    label: string; // 프론트 고정
+    percentage: number; // 백엔드 데이터
+    experience: number; // 백엔드 데이터
+    totalExperience: number; // 백엔드 데이터 또는 프론트 고정
+    year: string; // 프론트 고정
   }[];
 }
 
@@ -43,27 +43,29 @@ interface BottomCardProps {
   onIconPress: () => void;
 }
 
-const growthData: GrowthData = {
-  currentLevel: "F1-I",
-  nextLevel: "F1-II",
-  yearComparison: [
-    {
-      type: "top",
-      label: "작년까지 누적된 경험치 비율",
-      percentage: 37,
-      experience: 5000,
-      totalExperience: 13500,
-      year: "2023년",
-    },
-    {
-      type: "bottom",
-      label: "올해 획득한 경험치 비율",
-      percentage: 120,
-      experience: 7657,
-      totalExperience: 9000,
-      year: "2024년",
-    },
-  ],
+const transformData = (rawData: any): GrowthData => {
+  return {
+    currentLevel: rawData.currentLevel,
+    nextLevel: rawData.nextLevel,
+    yearComparison: [
+      {
+        type: "top",
+        label: "작년까지 누적된 경험치 비율", // 프론트 고정
+        percentage: rawData.previousExpPercentage,
+        experience: rawData.previousYearTotalExp,
+        totalExperience: rawData.nextLevelTotalExpRequirement,
+        year: "작년", // 프론트 고정
+      },
+      {
+        type: "bottom",
+        label: "올해 획득한 경험치 비율", // 프론트 고정
+        percentage: rawData.currentYearExpPercentage,
+        experience: rawData.currentYearTotalExp,
+        totalExperience: 9000, // 프론트 고정
+        year: "올해", // 프론트 고정
+      },
+    ],
+  };
 };
 
 const Popup: React.FC<{ visible: boolean; onClose: () => void; content: React.ReactNode }> = ({
@@ -74,12 +76,9 @@ const Popup: React.FC<{ visible: boolean; onClose: () => void; content: React.Re
   <Modal transparent={true} visible={visible} animationType="fade">
     <View style={styles.modalOverlay}>
       <View style={styles.modalContent}>
-        {/* 닫기 버튼 */}
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Image source={closeIcon} style={styles.closeIcon} />
         </TouchableOpacity>
-
-        {/* 팝업 내용 */}
         <View style={styles.popupContent}>
           <Image source={truckIcon} style={styles.popupIcon} />
           {content}
@@ -173,6 +172,55 @@ const BottomCard: React.FC<BottomCardProps> = ({ data, onIconPress }) => (
 const ExpGrowth: React.FC = () => {
   const [popupContent, setPopupContent] = useState<React.ReactNode>(null);
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [data, setData] = useState<GrowthData | null>(null);
+
+  const fetchCurrentLevel = async () => {
+    const BASE_URL = "http://35.216.61.56";
+    try {
+      const response = await fetch(`${BASE_URL}:8080/api/experience/state`);
+      if (!response.ok) {
+        throw new Error("state API 호출 실패");
+      }
+      const stateData = await response.json();
+      return stateData.currentLevel;
+    } catch (error) {
+      console.error("currentLevel 데이터를 불러오는 중 오류 발생:", error);
+      return null;
+    }
+  };
+  
+  const fetchGrowthData = async () => {
+    const BASE_URL = "http://35.216.61.56";
+    try {
+      const response = await fetch(`${BASE_URL}:8080/api/experience/growth`);
+      if (!response.ok) {
+        throw new Error("growth API 호출 실패");
+      }
+      const rawData = await response.json();
+      const transformedData = transformData(rawData);
+      return transformedData;
+    } catch (error) {
+      console.error("growth 데이터를 불러오는 중 오류 발생:", error);
+      return null;
+    }
+  };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 두 API를 병렬로 호출
+        const [currentLevel, growthData] = await Promise.all([fetchCurrentLevel(), fetchGrowthData()]);
+  
+        if (currentLevel && growthData) {
+          setData({ ...growthData, currentLevel });
+        }
+      } catch (error) {
+        console.error("데이터를 가져오는 중 오류 발생:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   const handleOpenPopup = (content: React.ReactNode) => {
     setPopupContent(content);
@@ -183,8 +231,13 @@ const ExpGrowth: React.FC = () => {
     setPopupVisible(false);
   };
 
-  const [data] = useState<GrowthData>(growthData);
-
+  if (!data) {
+    return (
+      <View style={styles.container}>
+        <Text>데이터를 로드 중...</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <Popup visible={isPopupVisible} onClose={handleClosePopup} content={popupContent} />

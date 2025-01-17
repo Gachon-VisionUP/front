@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, Modal, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router"; // 라우터 추가
+import { useRouter } from "expo-router";
+import axios from "axios";
 
 const infoIcon = require("../../assets/images/exp/info.png"); // 알림 아이콘
 const flagIcon = require("../../assets/images/exp/flag.png"); // 깃발 아이콘
@@ -8,27 +9,60 @@ const truckIcon = require("../../assets/images/exp/truck.png"); // 트럭 아이
 const closeIcon = require("../../assets/images/exp/close.png"); // 닫기 아이콘
 
 const dummyData = {
-  team: "F1-I",
-  nextLevelPoints: 343,
-  totalExperience: 13000,
-  personalExperience: 12657,
+  currentLevel: "F1-I",
+  nextLevelExpRequirement: 343,
+  nextLevelTotalExpRequirement: 13000,
+  totalExp: 12657,
   nextLevel: "F1-II",
-  yearComparison: [
-    { year: "2024년", experience: 7657 },
-    { year: "2023년", experience: 5000 },
-  ],
+  currentYearTotalExp: 7657,
+  previousYearTotalExp: 5000,
 };
 
+const BASE_URL = "http://35.216.61.56";
+
 export default function ExpStatus() {
-  const [data] = useState(dummyData);
+  const [data, setData] = useState(dummyData);
+  const [levels, setLevels] = useState([]); // API에서 가져온 레벨 데이터 저장
   const [isModalVisible, setModalVisible] = useState(false);
   const router = useRouter(); // 라우터 객체 생성
+
+  useEffect(() => {
+    const fetchExperienceData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}:8080/api/experience/state`);
+        console.log("서버 연결 성공", response.data);
+        setData(response.data);
+      } catch (error) {
+        console.error("서버 연결 실패. 고정 데이터를 사용합니다.", error);
+        console.log("고정 데이터:", dummyData);
+      }
+    };
+
+    const fetchLevelsData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}:8080/api/levels/group/all`);
+        console.log("레벨 데이터 가져오기 성공", response.data);
+    
+        // 데이터가 객체일 경우 첫 번째 값을 추출
+        const levelsArray = Object.values(response.data)[0] || [];
+        setLevels(
+          levelsArray.map(({ levelName, requiredExp }) => ({ levelName, requiredExp }))
+        );
+      } catch (error) {
+        console.error("레벨 데이터 가져오기 실패:");
+      }
+    };
+    
+
+    fetchExperienceData();
+    fetchLevelsData();
+  }, []);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const nextLevelPoints = data.totalExperience - data.personalExperience;
+  const nextLevelPoints = data.nextLevelTotalExpRequirement - data.totalExp;
 
   return (
     <View style={styles.container}>
@@ -36,7 +70,7 @@ export default function ExpStatus() {
       <View style={styles.header}>
         <Text style={styles.levelText}>오늘의 나의 레벨</Text>
         <View style={styles.teamInfo}>
-          <Text style={styles.teamName}>{data.team}</Text>
+          <Text style={styles.teamName}>{data.currentLevel}</Text>
           <TouchableOpacity onPress={toggleModal}>
             <Image source={infoIcon} style={styles.alertIcon} />
           </TouchableOpacity>
@@ -63,24 +97,11 @@ export default function ExpStatus() {
                   총 필요 경험치
                 </Text>
               </View>
-              {[
-                { level: "F1-I", experience: 0 },
-                { level: "F1-II", experience: 13500 },
-                { level: "F2-I", experience: 27000 },
-                { level: "F2-II", experience: 39000 },
-                { level: "F2-III", experience: 51000 },
-                { level: "F3-I", experience: 63000 },
-                { level: "F3-II", experience: 78000 },
-                { level: "F3-III", experience: 93000 },
-                { level: "F4-I", experience: 108000 },
-                { level: "F4-II", experience: 126000 },
-                { level: "F4-III", experience: 144000 },
-                { level: "F5", experience: 162000 },
-              ].map((item, index) => (
+              {levels.map((item, index) => (
                 <View key={index} style={[styles.tableRow]}>
-                  <Text style={styles.tableCell}>{item.level}</Text>
+                  <Text style={styles.tableCell}>{item.levelName}</Text>
                   <Text style={styles.tableCell}>
-                    {item.experience.toLocaleString()} do
+                    {item.requiredExp.toLocaleString()} do
                   </Text>
                 </View>
               ))}
@@ -98,13 +119,13 @@ export default function ExpStatus() {
           전체 누적 경험치 {" >"}
         </Text>
         <Text style={styles.levelUpInfo}>
-          다음 레벨까지 {data.nextLevelPoints} do
+          다음 레벨까지 {data.nextLevelExpRequirement} do
         </Text>
         <View style={styles.experienceBarContainer}>
           <View style={styles.flagContainer}>
             <Text style={styles.nextLevel}>{data.nextLevel || "F1-II"}</Text>
             <Text style={styles.totalExperienceText}>
-              {data.totalExperience} do
+              {data.nextLevelTotalExpRequirement} do
             </Text>
             <Image source={flagIcon} style={styles.flagIcon} />
           </View>
@@ -115,7 +136,7 @@ export default function ExpStatus() {
                 styles.truckIcon,
                 {
                   left: `${
-                    (data.personalExperience / data.totalExperience) * 100 - 5
+                    (data.totalExp / data.nextLevelTotalExpRequirement) * 100 - 5
                   }%`,
                 },
               ]}
@@ -125,7 +146,7 @@ export default function ExpStatus() {
                 styles.experienceProgress,
                 {
                   width: `${
-                    (data.personalExperience / data.totalExperience) * 100
+                    (data.totalExp / data.nextLevelTotalExpRequirement) * 100
                   }%`,
                 },
               ]}
@@ -135,13 +156,13 @@ export default function ExpStatus() {
                 styles.currentExperienceContainer,
                 {
                   left: `${
-                    (data.personalExperience / data.totalExperience) * 100 - 5
+                    (data.totalExp / data.nextLevelTotalExpRequirement) * 100 - 5
                   }%`,
                 },
               ]}
             >
               <Text style={styles.currentExperienceText}>
-                {data.personalExperience} do
+                {data.totalExp} do
               </Text>
             </View>
           </View>
@@ -156,14 +177,17 @@ export default function ExpStatus() {
         >
           연도별 / 항목별 누적 경험치 {" >"}
         </Text>
-        {data.yearComparison.map((item, index) => (
+        {[
+          { year: "올해", totalExp: data.currentYearTotalExp },
+          { year: "작년", totalExp: data.previousYearTotalExp },
+        ].map((item, index) => (
           <View key={index} style={styles.yearComparisonRow}>
             <Text
               style={[
                 styles.yearText,
                 {
                   left: `${
-                    (item.experience / data.totalExperience) * 100 - 5
+                    (item.totalExp / data.nextLevelTotalExpRequirement) * 100 - 5
                   }%`,
                 },
               ]}
@@ -177,7 +201,7 @@ export default function ExpStatus() {
                   styles.truckIconSmall,
                   {
                     left: `${
-                      (item.experience / data.totalExperience) * 100 - 5
+                      (item.totalExp / data.nextLevelTotalExpRequirement) * 100 - 5
                     }%`,
                   },
                 ]}
@@ -187,7 +211,7 @@ export default function ExpStatus() {
                   styles.experienceProgress,
                   {
                     width: `${
-                      (item.experience / data.totalExperience) * 100
+                      (item.totalExp / data.nextLevelTotalExpRequirement) * 100
                     }%`,
                   },
                 ]}
@@ -198,13 +222,13 @@ export default function ExpStatus() {
                 styles.currentYearExperienceContainer,
                 {
                   left: `${
-                    (item.experience / data.totalExperience) * 100 - 5
+                    (item.totalExp / data.nextLevelTotalExpRequirement) * 100 - 5
                   }%`,
                 },
               ]}
             >
               <Text style={styles.currentYearExperienceText}>
-                {item.experience} do
+                {item.totalExp} do
               </Text>
             </View>
           </View>

@@ -8,15 +8,32 @@ import { BackHandler, Alert } from 'react-native'; // BackHandler와 Alert를 �
 import 'react-native-reanimated';
 import { IconProvider } from '../context/IconContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import * as Notifications from 'expo-notifications';
 
 // 앱의 리소스 로드가 완료되기 전에 SplashScreen이 자동으로 숨겨지는 것을 방지
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const { status } = await Notifications.requestPermissionsAsync();
+  //     if (status !== 'granted') {
+  //       alert('알림 권한이 거부되었습니다!');
+  //     }
+  //   })();
+  // }, []);
 
   // 뒤로가기 버튼 차단 처리
   useEffect(() => {

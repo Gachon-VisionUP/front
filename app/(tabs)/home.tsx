@@ -1,8 +1,10 @@
-import { Image, StyleSheet, View, Text, StatusBar, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Title from "../../assets/images/login/Logo.png";
 import bell from "../../assets/images/main/bell.png";
+import noAlarm from "../../assets/images/noalarm.png";
 import styled from 'styled-components/native';
 
 import HomeIcon from "@/components/home/homeIcon";
@@ -11,8 +13,30 @@ import HomeExp from '@/components/home/homeExp';
 import HomeQuest from '@/components/home/homeQuset';
 import mypage from '@/assets/images/mypage.png';
 import gameIcon from '@/assets/images/main/gameIcon.png';
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function HomeScreen() {
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+
+  // Fetch notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/notifications/unread`);
+        const notifications = response.data;
+
+        // Check if there are any unread notifications
+        setHasUnreadNotifications(notifications.length > 0);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#000000" barStyle="light-content" animated={true} />
@@ -37,12 +61,12 @@ export default function HomeScreen() {
           </Link>
 
           {/* 아이콘 간격 추가 */}
-          <View style={{ width: 10 }}/>{/* 두 아이콘 사이 간격을 설정 */}
+          <View style={{ width: 10 }} />{/* 두 아이콘 사이 간격을 설정 */}
 
           {/* 알람 벨 */}
           <Link href={{ pathname: "../alarm" }}>
             <Image
-              source={bell}
+              source={hasUnreadNotifications ? bell : noAlarm}
               resizeMode="contain"
               style={styles.noticeIconImage}
             />

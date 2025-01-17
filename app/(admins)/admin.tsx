@@ -5,9 +5,26 @@ import postIcon from "../../assets/images/navigation/pencil.png";
 import registerIcon from "../../assets/images/navigation/paper.png";
 import Logo from "../../assets/images/login/Logo.png";
 import { useRouter } from "expo-router";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_NATIVE_BASE_URL || "http://35.216.61.56:8080";
 
 export default function AdminScreen() {
     const router = useRouter(); // useRouter 추가
+
+    const handleLogout = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/users/logout`);
+            if (response.status === 200) {
+                router.push("/login");
+            } else {
+                throw new Error("로그아웃 실패");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -18,13 +35,10 @@ export default function AdminScreen() {
                     <Text style={styles.adminText}>관리자</Text>
                     <Text style={styles.subText}>님 환영합니다!</Text>
                 </Text>
-                <TouchableOpacity
-                    onPress={() => router.push("/login")}
-                >
+                <TouchableOpacity onPress={handleLogout}>
                     <Text style={styles.loginOutText}>로그아웃 &gt;</Text>
                 </TouchableOpacity>
             </View>
-
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
@@ -34,7 +48,7 @@ export default function AdminScreen() {
                 >
                     <Image source={postIcon} style={styles.icon} />
                     <Text style={styles.buttonText}>
-                        게시판 글쓰기 <Text style={styles.greaterThan}>                        &gt;</Text>
+                        게시판 글쓰기 <Text style={styles.greaterThan}>&gt;</Text>
                     </Text>
                 </TouchableOpacity>
 
@@ -44,11 +58,10 @@ export default function AdminScreen() {
                 >
                     <Image source={registerIcon} style={styles.icon} />
                     <Text style={styles.buttonText}>
-                        구성원 신규 등록 <Text style={styles.greaterThan}>                     &gt;</Text>
+                        구성원 신규 등록 <Text style={styles.greaterThan}>&gt;</Text>
                     </Text>
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 }
@@ -85,7 +98,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         color: "#8D8A8A",
     },
-
     adminText: {
         fontSize: 24,
         fontWeight: "bold",
@@ -99,7 +111,6 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         marginBottom: 20,
-
     },
     button: {
         flexDirection: "row",

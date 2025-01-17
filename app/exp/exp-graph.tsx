@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Svg, Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
@@ -8,20 +8,53 @@ const backIcon = require("../../assets/images/exp/back.png"); // 뒤로가기 �
 
 const screenWidth = Dimensions.get("window").width;
 const chartSize = screenWidth * 0.52; // 차트 크기 조정
+const apiUrl = "http://35.216.61.56:8080/api/exp-bar/ring"; // 간소화된 API URL
 
 export default function ExpGraph() {
   const router = useRouter();
 
-  const data = {
-    totalExperience: 12657,
-    yearExperience: 7657,
-    previousExperience: 5000,
-    team: "F1-I",
-  };
+  // 초기값 설정
+  const [data, setData] = useState({
+    currentYearExp: 7657, // 기본값
+    previousYearExp: 5000, // 기본값
+    totalExp: 12657, // 기본값
+    levelName: "F1-I", // 기본값
+  });
+  const [isApiFailed, setIsApiFailed] = useState(false); // API 실패 여부
 
-  const total = data.yearExperience + data.previousExperience;
-  const yearPercentage = (data.yearExperience / total) * 100;
-  const previousPercentage = (data.previousExperience / total) * 100;
+  // API 호출
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          credentials: "include", // 세션 쿠키 포함
+        });
+
+        if (!response.ok) {
+          throw new Error("API 요청 실패");
+        }
+
+        const result = await response.json();
+        setData(result); // 서버에서 가져온 데이터로 업데이트
+        setIsApiFailed(false); // 실패 상태 초기화
+        console.log("서버 연동 성공:", result);
+      } catch (error) {
+        console.error("서버 연동 실패:", error);
+        setIsApiFailed(true); // 실패 시 플래그 설정
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // 경험치 비율 계산
+  const currentYearPercentage = data.totalExp
+    ? (data.currentYearExp / data.totalExp) * 100
+    : 0;
+  const previousYearPercentage = data.totalExp
+    ? (data.previousYearExp / data.totalExp) * 100
+    : 0;
 
   return (
     <View style={styles.container}>
@@ -38,14 +71,14 @@ export default function ExpGraph() {
         {/* 제목 및 레벨 */}
         <Text style={styles.subtitle}>전체 누적 경험치</Text>
         <Text style={styles.levelText}>오늘의 나의 레벨</Text>
-        <Text style={styles.teamName}>{data.team}</Text>
+        <Text style={styles.teamName}>{data.levelName || "N/A"}</Text>
 
         {/* 차트와 값 */}
         <View style={styles.chartWrapper}>
           {/* 주황색 값 (왼쪽) */}
           <View style={styles.valueLeft}>
             <Text style={[styles.valueText, { color: "#FF5C35" }]}>
-              {data.previousExperience.toLocaleString()} do
+              {data.previousYearExp.toLocaleString()} do
             </Text>
           </View>
 
@@ -69,7 +102,7 @@ export default function ExpGraph() {
                 stroke="#344BFD"
                 strokeWidth={20}
                 fill="none"
-                strokeDasharray={`${(yearPercentage / 100) * Math.PI * (chartSize - 30)}, ${
+                strokeDasharray={`${(currentYearPercentage / 100) * Math.PI * (chartSize - 30)}, ${
                   Math.PI * (chartSize - 30)
                 }`}
                 strokeDashoffset={0}
@@ -78,14 +111,14 @@ export default function ExpGraph() {
               />
             </Svg>
             <Text style={styles.experienceText}>
-              {data.totalExperience.toLocaleString()} do
+              {data.totalExp.toLocaleString()} do
             </Text>
           </View>
 
           {/* 파란색 값 (오른쪽) */}
           <View style={styles.valueRight}>
             <Text style={[styles.valueText, { color: "#344BFD" }]}>
-              {data.yearExperience.toLocaleString()} do
+              {data.currentYearExp.toLocaleString()} do
             </Text>
           </View>
         </View>
@@ -107,6 +140,7 @@ export default function ExpGraph() {
 }
 
 const styles = StyleSheet.create({
+  /* 동일한 스타일 */
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -198,7 +232,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   legendText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#555",
   },
 });

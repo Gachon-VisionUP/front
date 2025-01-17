@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ExpStatus from '../exp/exp-status';
 import ExpGrowth from '../exp/exp-growth';
+import axios from 'axios';
 
 const logoImage = require('../../assets/images/login/Logo.png');
 const graphIcon = require('../../assets/images/exp/graph.png');
 
-const experienceData = [
-  { id: '1', title: '상반기 인사평가', points: '+2500 do', date: '2025.01.04' },
-  { id: '2', title: '직무별 퀘스트', points: '+1300 do', date: '2025.01.04' },
-  { id: '3', title: '리더별 퀘스트', points: '+1300 do', date: '2025.01.04' },
-];
+const baseUrl = '35.216.61.56'; // Replace with your base URL
 
 export default function Exp() {
   const [activeTab, setActiveTab] = useState('경험치 목록');
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState('2025');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [experienceData, setExperienceData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [latestExpDate, setLatestExpDate] = useState('');
+  const [latestExp, setLatestExp] = useState('');
+
+  const fetchHomeData = async () => {
+    try {
+      console.log(' 홈 API 요청을 시작합니다...');
+      const response = await axios.get(`http://${baseUrl}:8080/api/home`);
+      console.log(' 홈 API 응답:', response.data);
+
+      if (response.data) {
+        console.log(' latestExpDate:', response.data.latestExpDate || '값 없음');
+        console.log('latestExp:', response.data.latestExp || '값 없음');
+
+        setLatestExpDate(response.data.latestExpDate || '');
+        setLatestExp(response.data.latestExp || '');
+      } else {
+        console.log(' 홈 API에서 데이터를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error(' 홈 API 요청 중 오류 발생:', error);
+    }
+  };
+
+  const fetchExperienceData = async (year) => {
+    setLoading(true);
+    try {
+      console.log(`Fetching data for year: ${year}`);
+      const response = await axios.get(`http://${baseUrl}:8080/api/experience/list?year=${year}`);
+      console.log('API Response:', response.data);
+
+      if (response.data && response.data.allExperiences && response.data.allExperiences.length > 0) {
+        setExperienceData(response.data.allExperiences);
+      } else {
+        console.log('No data found.');
+        setExperienceData([]); // 데이터를 비워줌
+      }
+    } catch (error) {
+      console.error('Error fetching experience data:', error);
+      console.log('Clearing data due to error.');
+      setExperienceData([]); // 데이터를 비워줌
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log('🔄 컴포넌트가 마운트되었습니다.');
+    fetchHomeData(); // 홈 API 호출
+    fetchExperienceData(selectedYear); // 경험치 데이터 호출
+  }, [selectedYear]);
 
   const renderContent = () => {
     if (activeTab === '경험치 목록') {
@@ -28,20 +77,20 @@ export default function Exp() {
                 <Image source={graphIcon} style={styles.graphIcon} />
                 <Text style={styles.cardHeaderText}>경험치</Text>
               </View>
-              <Text style={styles.cardSubtitle}>2025.01.04 기준</Text>
+              <Text style={styles.cardSubtitle}>
+                {latestExpDate ? `${latestExpDate} 기준` : `${selectedYear}.01.04 기준`}
+              </Text>
             </View>
             <View style={styles.mainTitleRow}>
-              <Text style={styles.mainTitle}>상반기 인사평가</Text>
-              <View style={styles.pointsContainer}>
-                <Text style={styles.points}>+2500</Text>
-                <Text style={styles.pointsUnit}> do</Text>
-              </View>
+              <Text style={styles.mainTitle}>
+                {latestExp ? `+${latestExp}` : ''} <Text style={styles.cardHeaderText}>최신 경험치</Text>
+              </Text>
             </View>
           </LinearGradient>
 
           {/* 드롭다운 */}
           <View style={styles.listHeaderContainer}>
-            <Text style={styles.listHeader}>{selectedYear}년 3개</Text>
+            <Text style={styles.listHeader}>{selectedYear}년</Text>
             <TouchableOpacity
               style={styles.dropdownToggle}
               onPress={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -51,7 +100,7 @@ export default function Exp() {
 
             {isDropdownOpen && (
               <View style={styles.dropdownList}>
-                {['2024', '2023', '2022'].map((year) => (
+                {['2025', '2024', '2023', '2022'].map((year) => (
                   <TouchableOpacity
                     key={year}
                     style={styles.dropdownItem}
@@ -68,20 +117,28 @@ export default function Exp() {
           </View>
 
           {/* 리스트 */}
-          <FlatList
-            data={experienceData}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.listCard}>
-                <View style={styles.listLeftBar} />
-                <View style={styles.listContent}>
-                  <Text style={styles.listTitle}>{item.title}</Text>
-                  <Text style={styles.listPoints}>{item.points}</Text>
-                </View>
-                <Text style={styles.listDate}>{item.date}</Text>
-              </TouchableOpacity>
-            )}
-          />
+          {loading ? (
+            <ActivityIndicator size="large" color="#0681E7" style={{ marginTop: 20 }} />
+          ) : experienceData.length === 0 ? (
+            <Text style={{ marginTop: 20, textAlign: 'center', color: '#555' }}>
+              데이터를 찾을 수 없습니다.
+            </Text>
+          ) : (
+            <FlatList
+              data={experienceData}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.listCard}>
+                  <View style={styles.listLeftBar} />
+                  <View style={styles.listContent}>
+                    <Text style={styles.listTitle}>{item.expType}</Text>
+                    <Text style={styles.listPoints}>+{item.exp}</Text>
+                  </View>
+                  <Text style={styles.listDate}>{item.obtainedDate}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
         </>
       );
     } else if (activeTab === '경험치 현황') {
@@ -128,6 +185,7 @@ export default function Exp() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -213,9 +271,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   mainTitle: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    marginLeft: 15,
+    color: '#F16E27',
   },
   pointsContainer: {
     flexDirection: 'row',
