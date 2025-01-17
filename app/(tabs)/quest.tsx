@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import axios from 'axios';
 import LeaderQuest from '../quest/leader-quest';
+import * as Notifications from 'expo-notifications';
 
 const logoImage = require('../../assets/images/login/Logo.png');
 
@@ -23,6 +24,7 @@ interface Quest {
   grantedDate: string;
 }
 
+
 const QuestScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('직무별 퀘스트'); // 탭 전환 상태
   const [year, setYear] = useState<number>(2024);
@@ -39,9 +41,59 @@ const QuestScreen: React.FC = () => {
     }
   };
 
+
+  // ✅ 알림 전송
+  const sendNotification = async (month: string) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '축하합니다!',
+        body: `${month}의 모든 주차가 활성화되었습니다!`,
+      },
+      trigger: null, // 즉시 보내려면 'trigger'에 'null'을 설정
+    });
+  };
+
   useEffect(() => {
+    renderMonths();
     fetchQuestData();
   }, [year]);
+
+  const isMonthFullyActive = (monthIndex: number): boolean => {
+    const weeksPerMonth = [4, 4, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4]; // Weeks distribution per month
+    let weekStart = 1;
+
+    // Calculate the starting week number for the given month
+    for (let i = 0; i < monthIndex; i++) {
+      weekStart += weeksPerMonth[i];
+    }
+
+    // Get the list of weeks for the given month
+    const weeksInMonth = Array.from(
+      { length: weeksPerMonth[monthIndex] },
+      (_, i) => weekStart + i
+    );
+
+    // Check if all weeks in the month are active
+    return weeksInMonth.every((weekNumber) =>
+      questData.some(
+        (quest) =>
+          quest.round === weekNumber &&
+          new Date(quest.grantedDate).getFullYear() === year
+      )
+    );
+  };
+
+  const renderMonths = () => {
+    return monthKeys.map((month, index) => {
+      const isFullyActive = isMonthFullyActive(index);
+      sendNotification(month);
+      return (
+        <>
+
+        </>
+      );
+    });
+  };
 
   const renderWeeks = () => {
     const weeksPerMonth = [4, 4, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4];
@@ -105,12 +157,12 @@ const QuestScreen: React.FC = () => {
         departmentRaw === 'EUMSEONG1'
           ? '음성 1센터'
           : departmentRaw === 'EUMSEONG2'
-          ? '음성 2센터'
-          : departmentRaw;
-  
+            ? '음성 2센터'
+            : departmentRaw;
+
       const part = questData[0]?.part || 'N/A';
       const cycle = questData[0]?.cycle === 'WEEKLY' ? '주' : questData[0]?.cycle || 'N/A';
-  
+
       return (
         <>
           <View style={styles.headerCard}>

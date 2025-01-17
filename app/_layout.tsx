@@ -26,14 +26,14 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('알림 권한이 거부되었습니다!');
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const { status } = await Notifications.requestPermissionsAsync();
+  //     if (status !== 'granted') {
+  //       alert('알림 권한이 거부되었습니다!');
+  //     }
+  //   })();
+  // }, []);
 
   // 뒤로가기 버튼 차단 처리
   useEffect(() => {
